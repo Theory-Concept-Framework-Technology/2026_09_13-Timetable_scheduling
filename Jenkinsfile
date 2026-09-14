@@ -51,7 +51,7 @@ pipeline {
             unit: 'MINUTES'
         )
 
-        ansiColor('xterm')
+        //ansiColor('xterm')
     }
 
     parameters {
