@@ -42,22 +42,114 @@
   ],
   "colorBy": "course_name",
   "colorMap": {
-    "Artificial Intelligence": "#6366F1",
-    "Cloud Computing": "#EC4899",
-    "Computer Networks": "#14B8A6",
-    "Cyber Security": "#F59E0B",
-    "DBMS": "#8B5CF6",
-    "Data Mining": "#EF4444",
-    "Data Structures": "#06B6D4",
-    "Machine Learning": "#84CC16",
-    "Operating Systems": "#F97316",
-    "Power BI": "#3B82F6",
-    "Python": "#A855F7",
-    "SQL": "#10B981",
-    "Software Engineering": "#E11D48",
-    "Statistics": "#0EA5E9",
-    "Web Development": "#CA8A04"
+    "Artificial Intelligence": "#C7D2FE",
+    "Cloud Computing": "#FBCFE8",
+    "Computer Networks": "#99F6E4",
+    "Cyber Security": "#FDE68A",
+    "DBMS": "#DDD6FE",
+    "Data Mining": "#FECACA",
+    "Data Structures": "#A5F3FC",
+    "Machine Learning": "#D9F99D",
+    "Operating Systems": "#FED7AA",
+    "Power BI": "#BFDBFE",
+    "Python": "#E9D5FF",
+    "SQL": "#A7F3D0",
+    "Software Engineering": "#FECDD3",
+    "Statistics": "#BAE6FD",
+    "Web Development": "#FEF08A"
   },
+  "pastelPalette": [
+    "#C7D2FE",
+    "#FBCFE8",
+    "#99F6E4",
+    "#FDE68A",
+    "#DDD6FE",
+    "#FECACA",
+    "#A5F3FC",
+    "#D9F99D",
+    "#FED7AA",
+    "#BFDBFE",
+    "#E9D5FF",
+    "#A7F3D0",
+    "#FECDD3",
+    "#BAE6FD",
+    "#FEF08A",
+    "#C4B5FD",
+    "#6EE7B7",
+    "#FCA5A5",
+    "#7DD3FC",
+    "#D8B4FE"
+  ],
+  "teacherIds": [
+    "T1",
+    "T10",
+    "T2",
+    "T4",
+    "T5",
+    "T7",
+    "T9"
+  ],
+  "defaultBorderMapDay": {
+    "Friday": "#6366F1",
+    "Monday": "#DB2777",
+    "Thursday": "#0D9488",
+    "Tuesday": "#D97706",
+    "Wednesday": "#7C3AED"
+  },
+  "defaultBorderMapTeacher": {
+    "T1": "#6366F1",
+    "T10": "#DB2777",
+    "T2": "#0D9488",
+    "T4": "#D97706",
+    "T5": "#7C3AED",
+    "T7": "#DC2626",
+    "T9": "#0891B2"
+  },
+  "fontPairs": [
+    {
+      "id": "modern",
+      "label": "Modern"
+    },
+    {
+      "id": "classic",
+      "label": "Classic"
+    },
+    {
+      "id": "technical",
+      "label": "Technical"
+    },
+    {
+      "id": "friendly",
+      "label": "Friendly"
+    },
+    {
+      "id": "editorial",
+      "label": "Editorial"
+    }
+  ],
+  "uiThemes": [
+    {
+      "id": "light",
+      "label": "Light"
+    },
+    {
+      "id": "dark",
+      "label": "Dark"
+    },
+    {
+      "id": "library",
+      "label": "The Library"
+    },
+    {
+      "id": "manuscript",
+      "label": "Manuscript"
+    },
+    {
+      "id": "midnight-scholar",
+      "label": "Midnight Scholar"
+    }
+  ],
+  "projectTitle": "Smart Timetable Scheduler",
   "showTeacher": true,
   "showRoom": true,
   "showSection": true,
@@ -70,6 +162,9 @@
   "sections": [
     "A",
     "B"
+  ],
+  "classOptions": [
+    "All Classes"
   ],
   "teacherNames": {
     "T1": "Allison Hill",

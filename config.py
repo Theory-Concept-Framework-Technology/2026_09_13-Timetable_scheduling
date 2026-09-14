@@ -127,26 +127,66 @@ TIMETABLE_DISPLAY_BREAKS = [
 # ============================================================
 
 COLOR_PALETTE = [
+    "#C7D2FE",
+    "#FBCFE8",
+    "#99F6E4",
+    "#FDE68A",
+    "#DDD6FE",
+    "#FECACA",
+    "#A5F3FC",
+    "#D9F99D",
+    "#FED7AA",
+    "#BFDBFE",
+    "#E9D5FF",
+    "#A7F3D0",
+    "#FECDD3",
+    "#BAE6FD",
+    "#FEF08A",
+    "#C4B5FD",
+    "#6EE7B7",
+    "#FCA5A5",
+    "#7DD3FC",
+    "#D8B4FE",
+]
+
+# Deeper accents for lesson block borders (teacher / day modes)
+BORDER_ACCENT_PALETTE = [
     "#6366F1",
-    "#EC4899",
-    "#14B8A6",
-    "#F59E0B",
-    "#8B5CF6",
-    "#EF4444",
-    "#06B6D4",
-    "#84CC16",
-    "#F97316",
-    "#3B82F6",
-    "#A855F7",
-    "#10B981",
-    "#E11D48",
-    "#0EA5E9",
-    "#CA8A04",
+    "#DB2777",
+    "#0D9488",
+    "#D97706",
     "#7C3AED",
-    "#059669",
     "#DC2626",
+    "#0891B2",
+    "#65A30D",
+    "#EA580C",
+    "#2563EB",
+    "#9333EA",
+    "#059669",
+    "#E11D48",
     "#0284C7",
-    "#9333EA"
+    "#CA8A04",
+    "#6D28D9",
+    "#047857",
+    "#B91C1C",
+    "#0369A1",
+    "#7E22CE",
+]
+
+FONT_PAIRS = [
+    {"id": "modern", "label": "Modern"},
+    {"id": "classic", "label": "Classic"},
+    {"id": "technical", "label": "Technical"},
+    {"id": "friendly", "label": "Friendly"},
+    {"id": "editorial", "label": "Editorial"},
+]
+
+UI_THEMES = [
+    {"id": "light", "label": "Light"},
+    {"id": "dark", "label": "Dark"},
+    {"id": "library", "label": "The Library"},
+    {"id": "manuscript", "label": "Manuscript"},
+    {"id": "midnight-scholar", "label": "Midnight Scholar"},
 ]
 
 

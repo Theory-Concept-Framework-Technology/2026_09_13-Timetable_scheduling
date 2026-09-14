@@ -65,7 +65,7 @@ flowchart LR
 
 ## Features
 
-- Professional dashboard with sidebar navigation
+- Modern landing page (Home), weekly CSS grid timetable, and Appearance panel (themes, font pairs, pastel fill and border colors — saved in your browser)
 - KPI cards and optimization summary (from `optimization_summary.json` when available)
 - Weekly timetable grid with filters (teacher, room, course, day)
 - Teacher, room, and course grouped views

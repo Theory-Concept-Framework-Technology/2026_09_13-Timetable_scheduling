@@ -9,7 +9,11 @@ import pandas as pd
 from config import (
     ACADEMIC_YEAR,
     PROJECT_TITLE,
+    PROJECT_SUBTITLE,
+    TECH_BADGES,
     SCHOOL_NAME,
+    FONT_PAIRS,
+    UI_THEMES,
 )
 
 
@@ -28,6 +32,132 @@ def dataframe_to_html(df: pd.DataFrame) -> str:
     )
 
 
+def render_head_extras() -> str:
+    return """
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,700;1,9..40,400&family=IBM+Plex+Sans:wght@400;600;700&family=Inter:wght@400;600;700&family=Lato:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Lobster&family=Nunito:wght@600;700&family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem("sts-theme") || "light";
+            var f = localStorage.getItem("sts-font") || "modern";
+            document.documentElement.setAttribute("data-theme", t);
+            document.documentElement.setAttribute("data-font", f);
+        } catch (e) {}
+    })();
+    </script>
+    """
+
+
+def render_splash_overlay() -> str:
+    return """
+    <div id="splash-overlay" class="splash-overlay" aria-hidden="true">
+        <p class="splash-word">timetable</p>
+    </div>
+    """
+
+
+def render_appearance_panel() -> str:
+    theme_opts = "".join(
+        f'<option value="{escape_text(t["id"])}">{escape_text(t["label"])}</option>'
+        for t in UI_THEMES
+    )
+    font_opts = "".join(
+        f'<option value="{escape_text(f["id"])}">{escape_text(f["label"])}</option>'
+        for f in FONT_PAIRS
+    )
+    return f"""
+    <aside id="appearance-panel" class="appearance-panel no-print" hidden>
+        <div class="appearance-panel-inner panel">
+            <div class="appearance-head">
+                <h2 class="appearance-title">Appearance</h2>
+                <button type="button" class="appearance-close" id="appearance-close" aria-label="Close">×</button>
+            </div>
+            <p class="muted appearance-hint">Theme, fonts, and pastel colors persist in this browser.</p>
+            <label class="appearance-field">Site theme
+                <select id="theme-select">{theme_opts}</select>
+            </label>
+            <label class="appearance-field">Font pair
+                <select id="font-pair">{font_opts}</select>
+            </label>
+            <p class="font-preview" id="font-preview">The quick brown fox schedules every class.</p>
+            <label class="appearance-field">Accent border identifies
+                <select id="border-mode">
+                    <option value="teacher">Teacher</option>
+                    <option value="day">Day of week</option>
+                    <option value="course">Course (same as fill)</option>
+                    <option value="none">None</option>
+                </select>
+            </label>
+            <p class="muted appearance-legend" id="border-legend">
+                Colored border describes the assigned teacher for each lesson block.
+            </p>
+            <div class="appearance-colors">
+                <div class="appearance-colors-head">
+                    <strong>Fill colors (courses)</strong>
+                    <button type="button" class="btn-text btn-sm" id="reset-fill-colors">Reset</button>
+                </div>
+                <div id="fill-color-list" class="color-picker-list"></div>
+            </div>
+            <div class="appearance-colors" id="border-color-section">
+                <div class="appearance-colors-head">
+                    <strong id="border-color-title">Border colors (teachers)</strong>
+                    <button type="button" class="btn-text btn-sm" id="reset-border-colors">Reset</button>
+                </div>
+                <div id="border-color-list" class="color-picker-list"></div>
+            </div>
+        </div>
+    </aside>
+    """
+
+
+def render_home_section(
+    school: str,
+    year: str,
+    badges_html: str,
+) -> str:
+    return f"""
+    <section id="section-home" class="page-section active">
+        <div class="landing-hero">
+            <p class="landing-eyebrow">Academic scheduling</p>
+            <h1 class="landing-title">{escape_text(PROJECT_TITLE)}</h1>
+            <p class="landing-subtitle">{escape_text(PROJECT_SUBTITLE)}</p>
+            <p class="landing-meta">{school} · {year}</p>
+            <div class="landing-badges">{badges_html}</div>
+            <div class="landing-cta">
+                <button type="button" class="btn-primary" data-goto-section="timetable">View weekly timetable</button>
+                <button type="button" class="btn-secondary" data-goto-section="analytics">Analytics &amp; insights</button>
+            </div>
+        </div>
+        <div id="home-kpi-row" class="kpi-grid landing-kpis"></div>
+        <div class="feature-grid">
+            <article class="feature-card panel">
+                <h3>Optimization-backed</h3>
+                <p class="muted">IBM CPLEX assigns courses under real scheduling constraints.</p>
+                <button type="button" class="btn-text" data-goto-section="optimization">See rules →</button>
+            </article>
+            <article class="feature-card panel">
+                <h3>Filter &amp; print</h3>
+                <p class="muted">Slice by teacher, room, section, or day; export CSV or print the grid.</p>
+                <button type="button" class="btn-text" data-goto-section="timetable">Open timetable →</button>
+            </article>
+            <article class="feature-card panel">
+                <h3>Room × time grid</h3>
+                <p class="muted">Fixed pastel blocks by room and slot — readable at a glance.</p>
+                <button type="button" class="btn-text" data-goto-section="gantt">Gantt view →</button>
+            </article>
+            <article class="feature-card panel">
+                <h3>Customize look</h3>
+                <p class="muted">Themes, font pairs, and pastel palettes for blocks and borders.</p>
+                <button type="button" class="btn-text" id="home-open-appearance">Appearance →</button>
+            </article>
+        </div>
+    </section>
+    """
+
+
 def render_empty_state(message: str) -> str:
     return f"""
 <!DOCTYPE html>
@@ -36,9 +166,11 @@ def render_empty_state(message: str) -> str:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Timetable Scheduler</title>
+    {render_head_extras()}
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="empty-state-body">
+<body class="empty-state-body app-body">
+    {render_splash_overlay()}
     <main class="empty-state-card">
         <h1>{escape_text(PROJECT_TITLE)}</h1>
         <p class="empty-message">{escape_text(message)}</p>
@@ -52,6 +184,7 @@ def render_empty_state(message: str) -> str:
         </ol>
         <p class="muted">Then open <code>output/timetable_gantt.html</code>.</p>
     </main>
+    <script src="app.js"></script>
 </body>
 </html>
 """
@@ -399,6 +532,10 @@ def build_dashboard_html(
 
     school = escape_text(dashboard_json.get("schoolName", SCHOOL_NAME))
     year = escape_text(dashboard_json.get("academicYear", ACADEMIC_YEAR))
+    badges_html = "".join(
+        f'<span class="tech-badge">{escape_text(b)}</span>'
+        for b in TECH_BADGES
+    )
 
     return f"""
 <!DOCTYPE html>
@@ -407,27 +544,37 @@ def build_dashboard_html(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{escape_text(page_title)}</title>
+    {render_head_extras()}
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="app-body">
+{render_splash_overlay()}
 <header class="site-header no-print">
     <div class="site-brand">
         <span class="site-title">{escape_text(PROJECT_TITLE)}</span>
     </div>
-    <nav class="top-nav" aria-label="Main">
-        <button type="button" class="top-nav-link active" data-section="timetable">Timetable</button>
-        <button type="button" class="top-nav-link" data-section="analytics">Analytics</button>
-        <button type="button" class="top-nav-link" data-section="optimization">Optimization</button>
-        <button type="button" class="top-nav-link" data-section="teachers">Teachers</button>
-        <button type="button" class="top-nav-link" data-section="rooms">Rooms</button>
-        <button type="button" class="top-nav-link" data-section="gantt">Gantt</button>
-        <button type="button" class="top-nav-link" data-section="about">About</button>
-    </nav>
+    <div class="header-actions">
+        <button type="button" class="btn-appearance" id="btn-appearance" aria-expanded="false" aria-controls="appearance-panel">Appearance</button>
+        <nav class="top-nav" aria-label="Main">
+            <button type="button" class="top-nav-link active" data-section="home">Home</button>
+            <button type="button" class="top-nav-link" data-section="timetable">Timetable</button>
+            <button type="button" class="top-nav-link" data-section="analytics">Analytics</button>
+            <button type="button" class="top-nav-link" data-section="optimization">Optimization</button>
+            <button type="button" class="top-nav-link" data-section="teachers">Teachers</button>
+            <button type="button" class="top-nav-link" data-section="rooms">Rooms</button>
+            <button type="button" class="top-nav-link" data-section="gantt">Gantt</button>
+            <button type="button" class="top-nav-link" data-section="about">About</button>
+        </nav>
+    </div>
 </header>
 
+{render_appearance_panel()}
+
 <main class="site-main">
-    <!-- PAGE 1: TIMETABLE (default) -->
-    <section id="section-timetable" class="page-section active">
+    {render_home_section(school, year, badges_html)}
+
+    <!-- TIMETABLE -->
+    <section id="section-timetable" class="page-section">
         <div class="print-header">
             <h1 class="school-sheet-title">{escape_text(PROJECT_TITLE)}</h1>
             <p class="school-sheet-sub">{school}</p>
@@ -525,8 +672,18 @@ def build_dashboard_html(
     <!-- PAGE 6: GANTT -->
     <section id="section-gantt" class="page-section">
         <h2>Gantt View</h2>
-        <p class="muted section-lead">Room timeline for technical review.</p>
-        <div class="gantt-wrapper panel">{gantt_html}</div>
+        <p class="muted section-lead">Room × time grid — same pastel blocks as the weekly timetable. Expand below for an advanced Plotly timeline.</p>
+        <div class="entity-toolbar no-print gantt-toolbar">
+            <label>Room
+                <select id="gantt-room-select"><option value="">All rooms</option></select>
+            </label>
+        </div>
+        <div id="room-gantt-grid-container" class="school-timetable-wrap"></div>
+        <details class="panel gantt-plotly-details no-print">
+            <summary>Advanced Plotly timeline</summary>
+            <p class="muted">Zoomable timeline export; axis clipped to scheduled hours.</p>
+            <div class="gantt-wrapper">{gantt_html}</div>
+        </details>
     </section>
 
     <!-- ABOUT -->

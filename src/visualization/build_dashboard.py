@@ -15,10 +15,14 @@ from config import (
     DAY_DATES,
     COLOR_BY,
     COLOR_PALETTE,
+    BORDER_ACCENT_PALETTE,
+    FONT_PAIRS,
+    UI_THEMES,
     FONT_FAMILY,
     BODY_FONT_SIZE,
     TITLE_FONT_SIZE,
     GANTT_HEIGHT,
+    GANTT_BAR_HEIGHT,
     PAGE_TITLE,
     SHOW_TEACHER,
     SHOW_ROOM,
@@ -62,6 +66,21 @@ def copy_web_assets() -> None:
         src = WEB_DIR / name
         if src.is_file():
             shutil.copy2(src, OUTPUT_DIR / name)
+    assets_src = WEB_DIR / "assets"
+    assets_dst = OUTPUT_DIR / "assets"
+    if assets_src.is_dir():
+        assets_dst.mkdir(exist_ok=True)
+        for item in assets_src.iterdir():
+            if item.is_file():
+                shutil.copy2(item, assets_dst / item.name)
+
+
+def build_accent_color_map(keys: List[str]) -> Dict[str, str]:
+    sorted_keys = sorted(keys)
+    result: Dict[str, str] = {}
+    for index, key in enumerate(sorted_keys):
+        result[key] = BORDER_ACCENT_PALETTE[index % len(BORDER_ACCENT_PALETTE)]
+    return result
 
 
 def load_optimization_summary() -> Optional[Dict]:
@@ -146,22 +165,37 @@ def build_gantt_html(timetable: pd.DataFrame, color_map: Dict[str, str]) -> str:
     )
 
     fig.update_yaxes(title="Room", autorange="reversed")
+    x_min = tt["start"].min() - pd.Timedelta(minutes=30)
+    x_max = tt["end"].max() + pd.Timedelta(minutes=30)
+    unique_rooms = tt["room"].nunique()
+    chart_height = max(400, int(unique_rooms * 80), GANTT_HEIGHT // 2)
+
     fig.update_xaxes(
         title="Day / Time",
         tickformat="%a %d %b<br>%H:%M",
+        range=[x_min, x_max],
     )
     fig.update_traces(
         textposition="inside",
         marker_line_width=1,
+        width=GANTT_BAR_HEIGHT,
     )
     fig.update_layout(
-        height=GANTT_HEIGHT,
+        height=chart_height,
         font=dict(family=FONT_FAMILY, size=BODY_FONT_SIZE),
         title_font=dict(size=TITLE_FONT_SIZE),
         xaxis=dict(rangeslider=dict(visible=True)),
-        legend_title=COLOR_BY.replace("_", " ").title(),
+        legend=dict(
+            title=COLOR_BY.replace("_", " ").title(),
+            orientation="h",
+            yanchor="top",
+            y=-0.2,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=11),
+        ),
         hoverlabel=dict(namelength=-1),
-        margin=dict(l=60, r=40, t=80, b=70),
+        margin=dict(l=60, r=40, t=80, b=120),
     )
 
     return fig.to_html(full_html=False, include_plotlyjs="inline")
@@ -262,6 +296,13 @@ def main() -> None:
         courses["section"].dropna().astype(str).unique().tolist()
     ) if "section" in courses.columns else []
 
+    teacher_ids = sorted(
+        timetable["teacher"].dropna().astype(str).unique().tolist()
+    ) if "teacher" in timetable.columns else []
+
+    day_border_map = build_accent_color_map(DAYS)
+    teacher_border_map = build_accent_color_map(teacher_ids)
+
     dashboard_json = {
         "days": DAYS,
         "dayShort": {
@@ -276,6 +317,13 @@ def main() -> None:
         "breakRows": TIMETABLE_DISPLAY_BREAKS,
         "colorBy": COLOR_BY,
         "colorMap": color_map,
+        "pastelPalette": COLOR_PALETTE,
+        "teacherIds": teacher_ids,
+        "defaultBorderMapDay": day_border_map,
+        "defaultBorderMapTeacher": teacher_border_map,
+        "fontPairs": FONT_PAIRS,
+        "uiThemes": UI_THEMES,
+        "projectTitle": PAGE_TITLE,
         "showTeacher": SHOW_TEACHER,
         "showRoom": SHOW_ROOM,
         "showSection": SHOW_SECTION,

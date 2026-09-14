@@ -36,3 +36,5 @@ output/*.html
 # OS
 .DS_Store
 Thumbs.db
+
+.cursor\plans
