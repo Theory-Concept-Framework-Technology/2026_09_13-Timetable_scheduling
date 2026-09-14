@@ -1,4 +1,4 @@
-# School_Timetable_Fresh — shared droplet: APP_PORT (default 8090) → container :80
+# School_Timetable_Fresh — APP_PORT (default 444) → container :80; Jenkins UI 8090
 # Output is baked into the image (replace on each image build). No output volume —
 # avoids stale files masking a new deploy. See Deploy/SHARED_DROPLET_PLAN.md
 
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "${APP_PORT:-8090}:80"
+      - "${APP_PORT:-444}:80"
 
     environment:
       PYTHONUNBUFFERED: "1"

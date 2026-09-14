@@ -9,7 +9,7 @@ set -eu
 : "${IMAGE_TAG:?Set IMAGE_TAG}"
 
 COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-school-timetable}"
-APP_PORT="${APP_PORT:-8090}"
+APP_PORT="${APP_PORT:-444}"
 APP_NAME="${APP_NAME:-school-timetable-fresh}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

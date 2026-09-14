@@ -1,52 +1,39 @@
-# School Timetable — shared droplet with Zyrowaste
-
-Deploy **School_Timetable_Fresh** on the same DigitalOcean droplet as Zyrowaste.
-
-| | |
-|--|--|
-| **Public IP (SSH + HTTP)** | `143.244.128.22` |
-| **Zyrowaste** | `https://zyrowaste.com` — `/opt/zyrowaste` — ports **80/443** |
-| **Jenkins (same droplet)** | `http://143.244.128.22:8080/` — host port **8080** (do not use for timetable) |
-| **This app (v1)** | `http://143.244.128.22:8090/` — `/opt/school-timetable` — host port **8090** |
-
-**Full context, architecture, Zyrowaste safety changes, and verification:**  
-see `D:\Zyrowaste_v3_jenkins-1\deploy\documentation\deployment\shared-droplet-school-timetable-plan.md`
-
----
-
-## Changes in this repo (summary)
-
-1. **`Deploy/droplet.env.example`** — `PROD_HOST`, `DEPLOY_PATH`, `APP_PORT=8090`, GHCR `IMAGE_NAME`.
-2. **`Deploy/.env.example`** — local copy for `Deploy/scripts/*.sh` (gitignored `Deploy/.env`).
-3. **`Deploy/examples/`** — template copies only (compose, Dockerfile, scripts, nginx); see `Deploy/examples/README.md`.
-4. **`docker-compose.yml`** — project name `school-timetable`; `8090:80` via `APP_PORT`.
-5. **`Deploy/scripts/deploy.sh`** — `docker compose -p school-timetable`; `/opt/school-timetable`; healthcheck after up.
-6. **`Deploy/scripts/healthcheck.sh`** — `PROD_HOST` + `APP_PORT` for `/health`.
-7. **`Deploy/scripts/rollback.sh`** — same compose `-p` scoping.
-8. **`Jenkinsfile`** — push image to registry; optional **`DEPLOY_TO_PROD`** via SSH to `143.244.128.22`.
-
-## Before first deploy
-
-- Zyrowaste side: set **`FRESH_CLEAN_DEPLOY=false`** and narrow Docker prune (see full plan Phase B).
-- DigitalOcean firewall: allow **TCP 8090** if using public `:8090` URL.
-- On droplet: `docker login ghcr.io` and `/opt/school-timetable/.env.production`.
-
-## Troubleshooting (Docker on the droplet)
-
-### `Bind for 0.0.0.0:80 failed: port is already allocated`
-
-Host port **80** is taken (Zyrowaste nginx); **8080** is Jenkins. Use **`-p 8090:80`**, not `-p 80:8080` (container nginx listens on **80**, not 8080).
-
-### `policy-rc.d denied execution of start` during `docker build`
-
-Harmless during image build. nginx starts when the container runs (`CMD nginx …`).
-
-### Quick manual run after `docker build -t timetable-app .`
-
-```bash
-docker rm -f timetable-app 2>/dev/null || true
-docker run -d --name timetable-app --restart unless-stopped -p 8090:80 timetable-app
-curl -f http://127.0.0.1:8090/health
-```
-
-Implementation order and checklists are in the full plan linked above.
+# School Timetable — shared droplet with Zyrowaste
+
+Deploy **School_Timetable_Fresh** on the same DigitalOcean droplet as Zyrowaste.
+
+| | |
+|--|--|
+| **Public IP (SSH + HTTP)** | `143.244.128.22` |
+| **Zyrowaste** | `https://zyrowaste.com` — `/opt/zyrowaste` — ports **80/443** |
+| **Jenkins (this project)** | `http://143.244.128.22:8090/` — host **8090** |
+| **Timetable app (v1)** | `http://143.244.128.22:444/` — `/opt/school-timetable` — host **444** |
+
+**Full context, architecture, Zyrowaste safety changes, and verification:**  
+see `D:\Zyrowaste_v3_jenkins-1\deploy\documentation\deployment\shared-droplet-school-timetable-plan.md`
+
+---
+
+## Changes in this repo (summary)
+
+1. **`Deploy/droplet.env.example`** — `APP_PORT=444`, `JENKINS_HTTP_PORT=8090`, GHCR `IMAGE_NAME`.
+2. **`docker-compose.yml`** — `444:80` via `APP_PORT`.
+3. **`Jenkinsfile`** — `APP_PORT=444`, `JENKINS_HTTP_PORT=8090`; deploy publishes app on **444** only.
+4. **`Deploy/scripts/deploy.sh`** / **`healthcheck.sh`** — defaults use port **444**.
+
+## Before first deploy
+
+- Zyrowaste: **`FRESH_CLEAN_DEPLOY=false`** and scoped Docker prune (full plan Phase B).
+- DigitalOcean firewall: **TCP 444** (app) and **8090** (Jenkins) as needed.
+- On droplet: `docker login ghcr.io` and `/opt/school-timetable/.env.production` with `APP_PORT=444`.
+
+## Manual run
+
+```bash
+docker rm -f timetable-app 2>/dev/null || true
+docker run -d --name timetable-app --restart unless-stopped -p 444:80 timetable-app
+curl -f http://127.0.0.1:444/health
+```
+
+Do **not** bind **80/443** (Zyrowaste) or **8090** (Jenkins UI for this project).
+
