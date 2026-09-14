@@ -15,9 +15,9 @@ These files are **documentation templates**. They are not used automatically by 
 **Manual run on droplet** (after `docker build`):
 
 ```bash
-docker run -d --name school-timetable-fresh --restart unless-stopped -p 8080:80 YOUR_IMAGE:tag
+docker run -d --name school-timetable-fresh --restart unless-stopped -p 8090:80 YOUR_IMAGE:tag
 ```
 
-Use **`8080:80`** (host:container). Do not map host port 80 on the shared droplet.
+Use **`8090:80`** (host:container). Do not map host port 80 or 8080 (Jenkins) on the shared droplet.
 
 Shared droplet summary: [`../SHARED_DROPLET_PLAN.md`](../SHARED_DROPLET_PLAN.md).

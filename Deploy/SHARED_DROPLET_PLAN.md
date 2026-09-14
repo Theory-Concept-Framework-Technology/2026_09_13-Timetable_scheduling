@@ -6,7 +6,8 @@ Deploy **School_Timetable_Fresh** on the same DigitalOcean droplet as Zyrowaste.
 |--|--|
 | **Public IP (SSH + HTTP)** | `143.244.128.22` |
 | **Zyrowaste** | `https://zyrowaste.com` — `/opt/zyrowaste` — ports **80/443** |
-| **This app (v1)** | `http://143.244.128.22:8080/` — `/opt/school-timetable` — host port **8080** |
+| **Jenkins (same droplet)** | `http://143.244.128.22:8080/` — host port **8080** (do not use for timetable) |
+| **This app (v1)** | `http://143.244.128.22:8090/` — `/opt/school-timetable` — host port **8090** |
 
 **Full context, architecture, Zyrowaste safety changes, and verification:**  
 see `D:\Zyrowaste_v3_jenkins-1\deploy\documentation\deployment\shared-droplet-school-timetable-plan.md`
@@ -15,10 +16,10 @@ see `D:\Zyrowaste_v3_jenkins-1\deploy\documentation\deployment\shared-droplet-sc
 
 ## Changes in this repo (summary)
 
-1. **`Deploy/droplet.env.example`** — `PROD_HOST`, `DEPLOY_PATH`, `APP_PORT=8080`, GHCR `IMAGE_NAME`.
+1. **`Deploy/droplet.env.example`** — `PROD_HOST`, `DEPLOY_PATH`, `APP_PORT=8090`, GHCR `IMAGE_NAME`.
 2. **`Deploy/.env.example`** — local copy for `Deploy/scripts/*.sh` (gitignored `Deploy/.env`).
 3. **`Deploy/examples/`** — template copies only (compose, Dockerfile, scripts, nginx); see `Deploy/examples/README.md`.
-4. **`docker-compose.yml`** — project name `school-timetable`; `8080:80` via `APP_PORT`.
+4. **`docker-compose.yml`** — project name `school-timetable`; `8090:80` via `APP_PORT`.
 5. **`Deploy/scripts/deploy.sh`** — `docker compose -p school-timetable`; `/opt/school-timetable`; healthcheck after up.
 6. **`Deploy/scripts/healthcheck.sh`** — `PROD_HOST` + `APP_PORT` for `/health`.
 7. **`Deploy/scripts/rollback.sh`** — same compose `-p` scoping.
@@ -27,14 +28,14 @@ see `D:\Zyrowaste_v3_jenkins-1\deploy\documentation\deployment\shared-droplet-sc
 ## Before first deploy
 
 - Zyrowaste side: set **`FRESH_CLEAN_DEPLOY=false`** and narrow Docker prune (see full plan Phase B).
-- DigitalOcean firewall: allow **TCP 8080** if using public `:8080` URL.
+- DigitalOcean firewall: allow **TCP 8090** if using public `:8090` URL.
 - On droplet: `docker login ghcr.io` and `/opt/school-timetable/.env.production`.
 
 ## Troubleshooting (Docker on the droplet)
 
 ### `Bind for 0.0.0.0:80 failed: port is already allocated`
 
-Host port **80** is taken (Zyrowaste nginx). Do **not** use `-p 80:…` for this app. Use **`-p 8080:80`**, not `-p 80:8080` (container nginx listens on **80**, not 8080).
+Host port **80** is taken (Zyrowaste nginx); **8080** is Jenkins. Use **`-p 8090:80`**, not `-p 80:8080` (container nginx listens on **80**, not 8080).
 
 ### `policy-rc.d denied execution of start` during `docker build`
 
@@ -44,8 +45,8 @@ Harmless during image build. nginx starts when the container runs (`CMD nginx �
 
 ```bash
 docker rm -f timetable-app 2>/dev/null || true
-docker run -d --name timetable-app --restart unless-stopped -p 8080:80 timetable-app
-curl -f http://127.0.0.1:8080/health
+docker run -d --name timetable-app --restart unless-stopped -p 8090:80 timetable-app
+curl -f http://127.0.0.1:8090/health
 ```
 
 Implementation order and checklists are in the full plan linked above.

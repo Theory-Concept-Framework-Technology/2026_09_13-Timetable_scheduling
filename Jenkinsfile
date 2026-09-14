@@ -80,7 +80,7 @@ pipeline {
         booleanParam(
             name: 'DEPLOY_TO_PROD',
             defaultValue: false,
-            description: 'Deploy to shared droplet (143.244.128.22:8080) via SSH'
+            description: 'Deploy to shared droplet (143.244.128.22:8090) via SSH'
         )
     }
 
@@ -98,7 +98,7 @@ pipeline {
 
         DEPLOY_PATH = "${env.DEPLOY_PATH ?: '/opt/school-timetable'}"
 
-        APP_PORT = "${env.APP_PORT ?: '8080'}"
+        APP_PORT = "${env.APP_PORT ?: '8090'}"
 
         COMPOSE_PROJECT_NAME = "${env.COMPOSE_PROJECT_NAME ?: 'school-timetable'}"
 
