@@ -1,0 +1,16 @@
+course_id,course_name,section,teacher,room,day,period
+C1,Python,A,T4,R1,Monday,1
+C2,SQL,A,T2,R1,Monday,2
+C3,Data Structures,B,T10,R4,Friday,1
+C4,DBMS,A,T1,R1,Tuesday,1
+C5,Machine Learning,A,T2,R1,Tuesday,2
+C6,Statistics,A,T4,R4,Thursday,1
+C7,Computer Networks,A,T9,R1,Wednesday,1
+C8,Operating Systems,B,T9,R1,Wednesday,2
+C9,Cloud Computing,B,T4,R4,Thursday,2
+C10,Power BI,B,T10,R1,Thursday,1
+C11,Artificial Intelligence,A,T1,R1,Thursday,2
+C12,Web Development,B,T7,R4,Wednesday,1
+C13,Data Mining,A,T5,R1,Friday,1
+C14,Cyber Security,B,T4,R1,Friday,2
+C15,Software Engineering,A,T2,R4,Friday,2

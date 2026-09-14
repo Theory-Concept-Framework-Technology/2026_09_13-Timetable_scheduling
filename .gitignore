@@ -26,10 +26,10 @@ htmlcov/
 .ci-venv/
 .test-venv/
 .lint-venv/
-
-# Generated output
-output/*.csv
-output/*.html
+"
+# # Generated output
+# output/*.csv
+# output/*.html"
 
 # Logs
 *.log
