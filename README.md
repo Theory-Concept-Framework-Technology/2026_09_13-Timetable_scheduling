@@ -114,7 +114,7 @@ During `apt-get install nginx` you may see `policy-rc.d denied execution of star
 
 **Run — port mapping (`-p HOST:CONTAINER`):**
 
-nginx listens on **port 80 inside the container**. On the shared droplet: **80/443** = Zyrowaste, **8090** = Jenkins for this project, **444** = timetable app (dedicated HTTP, analogous to Zyrowaste’s **443**).
+nginx listens on **port 80 inside the container**. On the shared droplet: **80/443** = Zyrowaste, **8080** = existing Jenkins, **8090** = timetable app, **8081** = optional dedicated Jenkins for this project.
 
 ```bash
 docker rm -f school-timetable-fresh 2>/dev/null || true
@@ -122,18 +122,18 @@ docker rm -f school-timetable-fresh 2>/dev/null || true
 docker run -d \
   --name school-timetable-fresh \
   --restart unless-stopped \
-  -p 444:80 \
+  -p 8090:80 \
   school-timetable-fresh:latest
 ```
 
 | Mapping | Meaning | Use here? |
 |---------|---------|-----------|
-| `-p 444:80` | Host **444** → container **80** | **Yes** (production on shared droplet) |
+| `-p 8090:80` | Host **8090** → container **80** | **Yes** (production on shared droplet) |
 | `-p 80:8080` | Host **80** → container **8080** | **No** — wrong container port; host 80 usually **already in use** |
 
-Verify: `curl -f http://127.0.0.1:444/health` on the server, or open `http://143.244.128.22:444/`.
+Verify: `curl -f http://127.0.0.1:8090/health` on the server, or open `http://143.244.128.22:8090/`.
 
-**Preferred on the server:** `docker compose -p school-timetable up -d` with `APP_PORT=444` (see [`docker-compose.yml`](docker-compose.yml) or [`Deploy/scripts/deploy.sh`](Deploy/scripts/deploy.sh)).
+**Preferred on the server:** `docker compose -p school-timetable up -d` with `APP_PORT=8090` (see [`docker-compose.yml`](docker-compose.yml) or [`Deploy/scripts/deploy.sh`](Deploy/scripts/deploy.sh)).
 
 ### Output files (replace on each run)
 
@@ -218,7 +218,7 @@ flowchart TB
   subgraph release [6 Deployment]
     image[Multi-stage Docker image]
     ssh[Deploy scripts SSH]
-    prod[Droplet :444 nginx]
+    prod[Droplet :8090 nginx]
   end
   subgraph ops [7 Operations]
     health[/health check]
@@ -275,7 +275,7 @@ Templates for operators (not auto-used): [`Deploy/examples/`](Deploy/examples/) 
 |------|----------------|
 | Unit / sanity | Jenkins stage **Validate Output** — required CSV/HTML files, non-empty timetable |
 | Integration | Full pipeline on Jenkins agent: generate → model → dashboard |
-| Container smoke | Jenkins **Docker Test** — `curl` `/` and `/health` on `APP_PORT` (default **444**) on the agent |
+| Container smoke | Jenkins **Docker Test** — `curl` `/` and `/health` on `APP_PORT` (default **8090**) on the agent |
 | Manual QA | Open `output/timetable_gantt.html`; verify grids, filters, Gantt room grid, Appearance persistence |
 | Regression | Fixed `RANDOM_SEED` in config for reproducible sample data |
 
@@ -296,7 +296,7 @@ Optional: set Jenkins parameter **SKIP_TESTS** only for emergency builds.
 | Push Docker Image | Registry (credential `docker-registry`); tag = build number + `latest` |
 | Archive Timetable | Store CSV/HTML as Jenkins artifacts |
 
-**Environment variables:** `IMAGE_NAME`, `PROD_HOST`, `DEPLOY_PATH`, `APP_PORT` (444), `JENKINS_HTTP_PORT` (8090), `COMPOSE_PROJECT_NAME` (see Jenkinsfile and `Deploy/droplet.env.example`).
+**Environment variables:** `IMAGE_NAME`, `PROD_HOST`, `DEPLOY_PATH`, `APP_PORT` (8090), `JENKINS_HTTP_PORT` (8081), `COMPOSE_PROJECT_NAME` (see Jenkinsfile and `Deploy/droplet.env.example`).
 
 ### 6. Deployment (release)
 
@@ -306,7 +306,7 @@ Optional: set Jenkins parameter **SKIP_TESTS** only for emergency builds.
 | **Manual SSH** | Export vars from `Deploy/.env` (from `.env.example`) and run `deploy.sh` from repo root |
 | **Docker Compose on server** | `docker-compose.yml` copied to `/opt/school-timetable`; image from registry |
 
-**Production URL (v1):** `http://143.244.128.22:444/` (app). **Jenkins (this project):** `http://143.244.128.22:8090/`.
+**Production URL (v1):** `http://143.244.128.22:8090/` (app). **Dedicated Jenkins:** `http://143.244.128.22:8081/` (existing main Jenkins stays on **8080**).
 
 **Release artifact:** immutable Docker image with baked, pruned `output/` (replace-on-regenerate; no output volume).
 
@@ -314,7 +314,7 @@ Optional: set Jenkins parameter **SKIP_TESTS** only for emergency builds.
 
 - Registry login on droplet (`docker login ghcr.io`)
 - `/opt/school-timetable/.env.production` with `IMAGE_NAME`, `IMAGE_TAG`, `APP_PORT`
-- Firewall allows TCP **444** (app) and **8090** (Jenkins UI)
+- Firewall allows TCP **8090** (app) and **8081** (timetable Jenkins, if used)
 - Zyrowaste deploy uses scoped Docker cleanup on shared droplet (see shared droplet plan)
 
 ### 7. Operations and monitoring

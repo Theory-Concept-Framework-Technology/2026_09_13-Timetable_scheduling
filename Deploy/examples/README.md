@@ -15,9 +15,9 @@ These files are **documentation templates**. They are not used automatically by 
 **Manual run on droplet** (after `docker build`):
 
 ```bash
-docker run -d --name school-timetable-fresh --restart unless-stopped -p 444:80 YOUR_IMAGE:tag
+docker run -d --name school-timetable-fresh --restart unless-stopped -p 8090:80 YOUR_IMAGE:tag
 ```
 
-Use **`444:80`** (host:container). Do not use 80/443 (Zyrowaste) or **8090** (Jenkins for this project).
+Use **`8090:80`** (host:container). Do not use 80/443 (Zyrowaste). Jenkins: **8080** (existing) or **8081** (timetable).
 
 Shared droplet summary: [`../SHARED_DROPLET_PLAN.md`](../SHARED_DROPLET_PLAN.md).

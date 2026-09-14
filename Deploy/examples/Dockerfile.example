@@ -2,7 +2,7 @@
 # School_Timetable_Fresh — multi-stage
 # Builder: CPLEX pipeline → fixed output/ artifacts (replace each build)
 # Runtime: nginx only serves /app/output (no Python/CPLEX in final image)
-# Host map: APP_PORT 444 → container :80 (Jenkins for project on 8090; Zyrowaste 80/443)
+# Host map: APP_PORT 8090 → container :80 (Jenkins 8081; Zyrowaste 80/443; legacy Jenkins 8080)
 # ============================================================
 
 # ── Build timetable + dashboard ──────────────────────────────

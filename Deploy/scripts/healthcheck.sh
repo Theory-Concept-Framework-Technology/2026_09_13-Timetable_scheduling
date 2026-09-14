@@ -5,7 +5,7 @@ set -eu
 
 : "${PROD_HOST:?Set PROD_HOST}"
 
-APP_PORT="${APP_PORT:-444}"
+APP_PORT="${APP_PORT:-8090}"
 URL="http://${PROD_HOST}:${APP_PORT}/health"
 
 echo "========================================="

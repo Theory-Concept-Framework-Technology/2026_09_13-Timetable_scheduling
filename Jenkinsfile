@@ -26,7 +26,7 @@
 //   ssh-school-timetable
 //
 // Shared droplet ports (143.244.128.22):
-//   Zyrowaste edge 80/443 | Timetable Jenkins UI 8090 | Timetable app 444 (APP_PORT)
+//   Zyrowaste 80/443 | Main Jenkins 8080 | Timetable app 8090 | Timetable Jenkins 8081 (optional)
 
 pipeline {
 
@@ -83,7 +83,7 @@ pipeline {
         booleanParam(
             name: 'DEPLOY_TO_PROD',
             defaultValue: false,
-            description: 'Deploy timetable app to droplet :444 (Jenkins for this project: :8090)'
+            description: 'Deploy timetable app to droplet :8090 (dedicated Jenkins UI: :8081)'
         )
     }
 
@@ -101,9 +101,9 @@ pipeline {
 
         DEPLOY_PATH = "${env.DEPLOY_PATH ?: '/opt/school-timetable'}"
 
-        APP_PORT = "${env.APP_PORT ?: '444'}"
+        APP_PORT = "${env.APP_PORT ?: '8090'}"
 
-        JENKINS_HTTP_PORT = "${env.JENKINS_HTTP_PORT ?: '8090'}"
+        JENKINS_HTTP_PORT = "${env.JENKINS_HTTP_PORT ?: '8081'}"
 
         COMPOSE_PROJECT_NAME = "${env.COMPOSE_PROJECT_NAME ?: 'school-timetable'}"
 
