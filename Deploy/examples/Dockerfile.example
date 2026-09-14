@@ -35,6 +35,7 @@ RUN apt-get update \
         nginx \
         wget \
     && rm -rf /var/lib/apt/lists/*
+# Note: apt may log "policy-rc.d denied execution of start" for nginx — expected during build.
 
 WORKDIR /app
 

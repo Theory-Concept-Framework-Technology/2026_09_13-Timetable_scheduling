@@ -102,7 +102,38 @@ Requires a valid **CPLEX** installation licensed for DOcplex.
 
 ### Docker
 
-Build runs data → model → dashboard; nginx serves `output/` (see `Dockerfile` and `Deploy/nginx/default.conf`).
+Build runs data → model → dashboard in the **builder** stage; the **runtime** image contains only nginx plus pruned `output/` (see [`Dockerfile`](Dockerfile) and [`Deploy/nginx/default.conf`](Deploy/nginx/default.conf)).
+
+**Build on the server (or locally):**
+
+```bash
+docker build -t school-timetable-fresh:latest .
+```
+
+During `apt-get install nginx` you may see `policy-rc.d denied execution of start` — that is **normal** in Docker builds (services must not start until the container runs). The image can still build successfully.
+
+**Run — port mapping (`-p HOST:CONTAINER`):**
+
+nginx listens on **port 80 inside the container**. On the shared droplet, **host port 80 is used by Zyrowaste** — bind **8080** on the host instead.
+
+```bash
+docker rm -f school-timetable-fresh 2>/dev/null || true
+
+docker run -d \
+  --name school-timetable-fresh \
+  --restart unless-stopped \
+  -p 8080:80 \
+  school-timetable-fresh:latest
+```
+
+| Mapping | Meaning | Use here? |
+|---------|---------|-----------|
+| `-p 8080:80` | Host **8080** → container **80** | **Yes** (production on shared droplet) |
+| `-p 80:8080` | Host **80** → container **8080** | **No** — wrong container port; host 80 usually **already in use** |
+
+Verify: `curl -f http://127.0.0.1:8080/health` on the server, or open `http://143.244.128.22:8080/`.
+
+**Preferred on the server:** `docker compose -p school-timetable up -d` with `APP_PORT=8080` (see [`docker-compose.yml`](docker-compose.yml) or [`Deploy/scripts/deploy.sh`](Deploy/scripts/deploy.sh)).
 
 ### Output files (replace on each run)
 

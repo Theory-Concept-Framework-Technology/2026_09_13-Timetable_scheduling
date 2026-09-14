@@ -12,4 +12,12 @@ These files are **documentation templates**. They are not used automatically by 
 
 **Runnable scripts** live in [`../scripts/`](../scripts/). **Production compose** is [`../../docker-compose.yml`](../../docker-compose.yml).
 
+**Manual run on droplet** (after `docker build`):
+
+```bash
+docker run -d --name school-timetable-fresh --restart unless-stopped -p 8080:80 YOUR_IMAGE:tag
+```
+
+Use **`8080:80`** (host:container). Do not map host port 80 on the shared droplet.
+
 Shared droplet summary: [`../SHARED_DROPLET_PLAN.md`](../SHARED_DROPLET_PLAN.md).

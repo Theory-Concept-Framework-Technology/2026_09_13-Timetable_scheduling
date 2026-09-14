@@ -30,4 +30,22 @@ see `D:\Zyrowaste_v3_jenkins-1\deploy\documentation\deployment\shared-droplet-sc
 - DigitalOcean firewall: allow **TCP 8080** if using public `:8080` URL.
 - On droplet: `docker login ghcr.io` and `/opt/school-timetable/.env.production`.
 
+## Troubleshooting (Docker on the droplet)
+
+### `Bind for 0.0.0.0:80 failed: port is already allocated`
+
+Host port **80** is taken (Zyrowaste nginx). Do **not** use `-p 80:…` for this app. Use **`-p 8080:80`**, not `-p 80:8080` (container nginx listens on **80**, not 8080).
+
+### `policy-rc.d denied execution of start` during `docker build`
+
+Harmless during image build. nginx starts when the container runs (`CMD nginx …`).
+
+### Quick manual run after `docker build -t timetable-app .`
+
+```bash
+docker rm -f timetable-app 2>/dev/null || true
+docker run -d --name timetable-app --restart unless-stopped -p 8080:80 timetable-app
+curl -f http://127.0.0.1:8080/health
+```
+
 Implementation order and checklists are in the full plan linked above.
