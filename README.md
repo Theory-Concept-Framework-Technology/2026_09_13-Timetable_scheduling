@@ -153,3 +153,172 @@ School_Timetable_Fresh/
 - Timetable generation is batch-only (`run.bat` / CLI); the HTML UI does not run CPLEX in the browser
 - Loading/progress steps during solve are not shown in the UI (console only during `build_model`)
 - Conflict panel validates the **exported** timetable; it does not change the solver
+
+## Software Development Life Cycle (SDLC)
+
+This project follows a practical SDLC aligned with a **batch optimization pipeline** and a **static dashboard** served in production. Stages map to folders and automation in this repository.
+
+```mermaid
+flowchart TB
+  subgraph plan [1 Planning]
+    req[Requirements and constraints]
+    cfg[config.py timetable settings]
+  end
+  subgraph design [2 Design]
+    mip[MIP model design]
+    ui[Dashboard UX and themes]
+    deployPlan[Deploy SHARED_DROPLET_PLAN]
+  end
+  subgraph build [3 Implementation]
+    gen[generate_data]
+    model[build_model]
+    dash[build_dashboard]
+    web[src/web CSS and JS]
+  end
+  subgraph test [4 Testing and QA]
+    local[run.bat local pipeline]
+    jenkinsVal[Jenkins validate output]
+    dockerTest[Jenkins Docker smoke test]
+  end
+  subgraph ci [5 CI/CD]
+    jenkins[Jenkinsfile build and push]
+    ghcr[Container registry GHCR]
+  end
+  subgraph release [6 Deployment]
+    image[Multi-stage Docker image]
+    ssh[Deploy scripts SSH]
+    prod[Droplet :8080 nginx]
+  end
+  subgraph ops [7 Operations]
+    health[/health check]
+    rollback[rollback.sh]
+  end
+  subgraph maintain [8 Maintenance]
+    fix[Model or UI fixes]
+    redeploy[New image tag deploy]
+  end
+  plan --> design --> build --> test --> ci --> release --> ops --> maintain
+  maintain --> build
+```
+
+### 1. Planning and requirements
+
+| Activity | Outcome in this repo |
+|----------|----------------------|
+| Problem definition | Course, room, teacher, section scheduling with CPLEX |
+| Scope | Batch generation; no in-browser solver |
+| Configuration | [`config.py`](config.py) — days, periods, palette, school metadata |
+| Deployment target | Shared DigitalOcean droplet with Zyrowaste — [`Deploy/SHARED_DROPLET_PLAN.md`](Deploy/SHARED_DROPLET_PLAN.md) |
+
+**Entry criteria:** constraints and timetable dimensions agreed. **Exit criteria:** `config.py` and README constraint list match [`build_model.py`](src/model/build_model.py).
+
+### 2. Analysis and design
+
+| Layer | Design artifact |
+|-------|-----------------|
+| Optimization | Binary MIP variables, four exclusivity constraints, late-period objective |
+| Data | Faker-generated CSV schema under `output/` |
+| Presentation | Static HTML dashboard, embedded JSON, client-side filters and themes |
+| Serving | nginx serves pruned `output/`; multi-stage Docker separates build vs runtime |
+| CI/CD | Root [`Jenkinsfile`](Jenkinsfile); prod SSH via [`Deploy/scripts/`](Deploy/scripts/) |
+
+Templates for operators (not auto-used): [`Deploy/examples/`](Deploy/examples/) and [`Deploy/droplet.env.example`](Deploy/droplet.env.example).
+
+### 3. Implementation (development)
+
+| Step | Command / location |
+|------|---------------------|
+| Local setup | `run.bat` or venv + `pip install -r requirements.txt` |
+| Generate data | `python -m src.data_generation.generate_data` |
+| Optimize | `python -m src.model.build_model` (requires CPLEX) |
+| Build UI | `python -m src.visualization.build_dashboard` |
+| Front-end assets | Edit [`src/web/style.css`](src/web/style.css), [`src/web/app.js`](src/web/app.js); copied to `output/` on dashboard build |
+
+**Branching:** feature work on git branches; merge to `main` / `master` when pipeline-ready.
+
+**Coding standards:** keep CPLEX logic in `build_model.py`; UI and analytics in `visualization/` and `web/` without changing solver semantics unless requirements change.
+
+### 4. Testing and quality assurance
+
+| Type | How it is done |
+|------|----------------|
+| Unit / sanity | Jenkins stage **Validate Output** — required CSV/HTML files, non-empty timetable |
+| Integration | Full pipeline on Jenkins agent: generate → model → dashboard |
+| Container smoke | Jenkins **Docker Test** — `curl` `/` and `/health` on `APP_PORT` (default 8080) on the agent |
+| Manual QA | Open `output/timetable_gantt.html`; verify grids, filters, Gantt room grid, Appearance persistence |
+| Regression | Fixed `RANDOM_SEED` in config for reproducible sample data |
+
+Optional: set Jenkins parameter **SKIP_TESTS** only for emergency builds.
+
+### 5. Continuous integration (CI)
+
+**File:** [`Jenkinsfile`](Jenkinsfile)
+
+| Stage | Purpose |
+|-------|---------|
+| Pre-clean | Workspace hygiene |
+| Checkout | SCM + build metadata |
+| Python setup | venv + `requirements.txt` |
+| Generate / Model / Dashboard | Same as local pipeline |
+| Validate Output | Artifact checks |
+| Build Docker Image | Multi-stage [`Dockerfile`](Dockerfile) |
+| Push Docker Image | Registry (credential `docker-registry`); tag = build number + `latest` |
+| Archive Timetable | Store CSV/HTML as Jenkins artifacts |
+
+**Environment variables:** `IMAGE_NAME`, `PROD_HOST`, `DEPLOY_PATH`, `APP_PORT`, `COMPOSE_PROJECT_NAME` (defaults documented in Jenkinsfile and `Deploy/droplet.env.example`).
+
+### 6. Deployment (release)
+
+| Method | When to use |
+|--------|-------------|
+| **Jenkins + SSH** | Enable **DEPLOY_TO_PROD** — runs [`Deploy/scripts/deploy.sh`](Deploy/scripts/deploy.sh) |
+| **Manual SSH** | Export vars from `Deploy/.env` (from `.env.example`) and run `deploy.sh` from repo root |
+| **Docker Compose on server** | `docker-compose.yml` copied to `/opt/school-timetable`; image from registry |
+
+**Production URL (v1):** `http://143.244.128.22:8080/` (host port **8080**, not 80/443 — reserved for Zyrowaste).
+
+**Release artifact:** immutable Docker image with baked, pruned `output/` (replace-on-regenerate; no output volume).
+
+**Pre-deploy checklist:**
+
+- Registry login on droplet (`docker login ghcr.io`)
+- `/opt/school-timetable/.env.production` with `IMAGE_NAME`, `IMAGE_TAG`, `APP_PORT`
+- Firewall allows TCP **8080**
+- Zyrowaste deploy uses scoped Docker cleanup on shared droplet (see shared droplet plan)
+
+### 7. Operations and monitoring
+
+| Check | Tool |
+|-------|------|
+| HTTP health | `GET /health` — nginx in [`Deploy/nginx/default.conf`](Deploy/nginx/default.conf) |
+| Post-deploy verify | [`Deploy/scripts/healthcheck.sh`](Deploy/scripts/healthcheck.sh) |
+| Container health | Compose healthcheck in [`docker-compose.yml`](docker-compose.yml) |
+| Logs | `docker compose -p school-timetable logs` on server |
+| Rollback | Set `IMAGE_TAG` to previous build; [`Deploy/scripts/rollback.sh`](Deploy/scripts/rollback.sh) helper |
+
+### 8. Maintenance and evolution
+
+| Activity | Typical change location |
+|----------|-------------------------|
+| New constraint | `src/model/build_model.py`, README constraints, dashboard copy |
+| UI / themes | `src/web/*`, `html_templates.py`, rebuild dashboard |
+| Deploy / port | `docker-compose.yml`, `Deploy/scripts/*`, `Deploy/droplet.env.example` |
+| Dependency updates | `requirements.txt`, re-run full pipeline and Jenkins |
+
+**Change flow:** local `run.bat` → commit → Jenkins green build → push image → deploy with new tag → healthcheck.
+
+**End-of-life:** stop compose project on droplet (`docker compose -p school-timetable down`); remove image from registry when retired.
+
+### SDLC roles (typical)
+
+| Role | Responsibility in this project |
+|------|--------------------------------|
+| Developer | Model, Python pipeline, dashboard, Docker/Jenkins updates |
+| DevOps / release | Jenkins credentials, droplet SSH, firewall, compose on server |
+| Stakeholder / admin | Accepts timetable rules, reviews dashboard and KPIs in browser |
+
+### Related documentation
+
+- Shared droplet summary: [`Deploy/SHARED_DROPLET_PLAN.md`](Deploy/SHARED_DROPLET_PLAN.md)
+- Deploy templates: [`Deploy/examples/README.md`](Deploy/examples/README.md)
+- Python 3.7 legacy notes: [`ReadMe_All/README_Python37.md`](ReadMe_All/README_Python37.md) (if applicable to your environment)
