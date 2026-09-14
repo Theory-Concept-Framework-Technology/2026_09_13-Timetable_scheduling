@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 venv/
 env/
+.env/
 
 # Testing
 .pytest_cache/
@@ -36,5 +37,8 @@ output/*.html
 # OS
 .DS_Store
 Thumbs.db
+
+# Local deploy env (copy from Deploy/.env.example)
+Deploy/.env
 
 .cursor\plans

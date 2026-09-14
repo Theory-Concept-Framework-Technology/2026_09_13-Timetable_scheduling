@@ -1,0 +1,41 @@
+# Example only — production file: Deploy/nginx/default.conf
+
+server {
+
+    listen 80;
+
+    server_name _;
+
+
+    root /app/output;
+
+    index timetable_gantt.html;
+
+
+    location / {
+
+        try_files $uri $uri/ /timetable_gantt.html;
+    }
+
+
+    location /health {
+
+        default_type text/plain;
+
+        return 200 "School Timetable OK\n";
+    }
+
+
+    location ~* \.(csv)$ {
+
+        add_header Content-Disposition "inline";
+    }
+
+
+    location ~* \.(html|css|js)$ {
+
+        expires 1h;
+
+        add_header Cache-Control "public";
+    }
+}

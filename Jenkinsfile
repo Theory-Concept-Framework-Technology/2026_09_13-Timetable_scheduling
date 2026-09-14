@@ -22,7 +22,7 @@
 // Jenkins credential required for pushing Docker image:
 //   docker-registry
 //
-// Optional SSH deployment credential:
+// Optional SSH deployment credential (or reuse ssh-prod on shared droplet):
 //   ssh-school-timetable
 
 pipeline {
@@ -70,15 +70,37 @@ pipeline {
             defaultValue: true,
             description: 'Run generated dashboard inside Docker'
         )
+
+        booleanParam(
+            name: 'PUSH_IMAGE',
+            defaultValue: true,
+            description: 'Push Docker image to registry after build'
+        )
+
+        booleanParam(
+            name: 'DEPLOY_TO_PROD',
+            defaultValue: false,
+            description: 'Deploy to shared droplet (143.244.128.22:8080) via SSH'
+        )
     }
 
     environment {
 
         APP_NAME = 'school-timetable-fresh'
 
-        IMAGE_NAME = "${env.DOCKER_REGISTRY ?: 'docker.io'}/${env.DOCKER_NAMESPACE ?: 'yourusername'}/school-timetable-fresh"
+        DOCKER_REGISTRY = "${env.DOCKER_REGISTRY ?: 'ghcr.io'}"
 
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_NAME = "${env.IMAGE_NAME ?: 'ghcr.io/your-github-user/school-timetable-fresh'}"
+
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+
+        PROD_HOST = "${env.PROD_HOST ?: '143.244.128.22'}"
+
+        DEPLOY_PATH = "${env.DEPLOY_PATH ?: '/opt/school-timetable'}"
+
+        APP_PORT = "${env.APP_PORT ?: '8080'}"
+
+        COMPOSE_PROJECT_NAME = "${env.COMPOSE_PROJECT_NAME ?: 'school-timetable'}"
 
         PYTHON_VERSION = '3.10'
 
@@ -398,7 +420,7 @@ pipeline {
 
                     docker run -d \
                         --name school-timetable-test \
-                        -p 8080:80 \
+                        -p ${APP_PORT}:80 \
                         "${BUILT_IMAGE}"
 
                     echo "Waiting for application..."
@@ -408,7 +430,10 @@ pipeline {
                     echo "Testing dashboard..."
 
                     curl --fail \
-                        http://127.0.0.1:8080/
+                        "http://127.0.0.1:${APP_PORT}/"
+
+                    curl --fail \
+                        "http://127.0.0.1:${APP_PORT}/health"
 
                     echo ""
                     echo "✓ Docker container is serving dashboard."
@@ -422,7 +447,70 @@ pipeline {
 
 
         // ============================================================
-        // 10. ARCHIVE OUTPUT
+        // 9. PUSH DOCKER IMAGE
+        // ============================================================
+
+        stage('Push Docker Image') {
+
+            when {
+                expression {
+                    params.BUILD_DOCKER && params.PUSH_IMAGE
+                }
+            }
+
+            steps {
+
+                script {
+
+                    docker.withRegistry(
+                        "https://${env.DOCKER_REGISTRY}",
+                        'docker-registry'
+                    ) {
+                        docker.image("${env.IMAGE_NAME}:${env.IMAGE_TAG}").push()
+                        docker.image("${env.IMAGE_NAME}:latest").push()
+                    }
+                }
+
+                sh 'docker image prune -f || true'
+            }
+        }
+
+
+        // ============================================================
+        // 10. DEPLOY TO SHARED DROPLET
+        // ============================================================
+
+        stage('Deploy to Production') {
+
+            when {
+                expression {
+                    params.DEPLOY_TO_PROD && params.BUILD_DOCKER && params.PUSH_IMAGE
+                }
+            }
+
+            steps {
+
+                sshagent(credentials: ['ssh-school-timetable']) {
+
+                    sh """
+                        set -eu
+                        chmod +x Deploy/scripts/deploy.sh Deploy/scripts/healthcheck.sh
+                        export PROD_HOST='${PROD_HOST}'
+                        export DEPLOY_PATH='${DEPLOY_PATH}'
+                        export APP_PORT='${APP_PORT}'
+                        export COMPOSE_PROJECT_NAME='${COMPOSE_PROJECT_NAME}'
+                        export IMAGE_NAME='${IMAGE_NAME}'
+                        export IMAGE_TAG='${IMAGE_TAG}'
+                        export APP_NAME='${APP_NAME}'
+                        ./Deploy/scripts/deploy.sh
+                    """
+                }
+            }
+        }
+
+
+        // ============================================================
+        // 11. ARCHIVE OUTPUT
         // ============================================================
 
         stage('Archive Timetable') {
@@ -458,6 +546,7 @@ pipeline {
             Timetable generated successfully.
             Dashboard generated successfully.
             Docker image built successfully.
+            Live URL (when deployed): http://${PROD_HOST}:${APP_PORT}/
 
             ==========================================
             """
