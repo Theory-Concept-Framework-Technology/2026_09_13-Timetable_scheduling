@@ -1,26 +1,34 @@
 # ============================================================
-# School_Timetable_Fresh
-# Python + CPLEX + Faker + Plotly
-#
-# Container nginx listens on :80. On the shared droplet, publish
-# host port 8080 (APP_PORT) — not 80/443 (reserved for Zyrowaste).
+# School_Timetable_Fresh — multi-stage
+# Builder: CPLEX pipeline → fixed output/ artifacts (replace each build)
+# Runtime: nginx only serves /app/output (no Python/CPLEX in final image)
+# Host map: APP_PORT 8080 → container :80 (shared droplet with Zyrowaste)
 # ============================================================
 
-FROM python:3.10-slim
-
-# ------------------------------------------------------------
-# Environment
-# ------------------------------------------------------------
+# ── Build timetable + dashboard ──────────────────────────────
+FROM python:3.10-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# ------------------------------------------------------------
-# System dependencies
-# ------------------------------------------------------------
+COPY config.py .
+COPY src/ ./src/
+
+RUN python -m src.data_generation.generate_data \
+    && python -m src.model.build_model \
+    && python -m src.visualization.build_dashboard
+
+
+# ── Serve static dashboard ───────────────────────────────────
+FROM python:3.10-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -28,59 +36,14 @@ RUN apt-get update \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /app
 
-# ------------------------------------------------------------
-# Python requirements
-# ------------------------------------------------------------
-
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-
-# ------------------------------------------------------------
-# Project files
-# ------------------------------------------------------------
-
-COPY config.py .
-
-COPY src/ ./src/
-
-
-# Create output directory
-
-RUN mkdir -p /app/output
-
-
-# ------------------------------------------------------------
-# Generate timetable
-# ------------------------------------------------------------
-
-RUN python -m src.data_generation.generate_data \
-    && python -m src.model.build_model \
-    && python -m src.visualization.build_dashboard
-
-
-# ------------------------------------------------------------
-# Configure nginx
-# ------------------------------------------------------------
+COPY --from=builder /app/output /app/output
 
 RUN rm -f /etc/nginx/sites-enabled/default
 
-COPY Deploy/nginx/default.conf \
-     /etc/nginx/conf.d/default.conf
-
-
-# ------------------------------------------------------------
-# Expose HTTP
-# ------------------------------------------------------------
+COPY Deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-
-
-# ------------------------------------------------------------
-# Start nginx
-# ------------------------------------------------------------
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,5 +1,6 @@
-# School_Timetable_Fresh — shared droplet: map host APP_PORT (default 8080) → container :80
-# Zyrowaste uses 80/443 on the same VM; see Deploy/SHARED_DROPLET_PLAN.md
+# School_Timetable_Fresh — shared droplet: APP_PORT (default 8080) → container :80
+# Output is baked into the image (replace on each image build). No output volume —
+# avoids stale files masking a new deploy. See Deploy/SHARED_DROPLET_PLAN.md
 
 name: school-timetable
 
@@ -19,17 +20,13 @@ services:
     environment:
       PYTHONUNBUFFERED: "1"
 
-    volumes:
-      # Persist generated timetable files
-      - timetable_output:/app/output
-
     healthcheck:
       test:
         [
           "CMD",
           "wget",
           "-qO-",
-          "http://127.0.0.1:80/"
+          "http://127.0.0.1:80/health"
         ]
 
       interval: 15s
@@ -51,9 +48,3 @@ networks:
   timetable-network:
     driver: bridge
     name: school_timetable_network
-
-
-volumes:
-
-  timetable_output:
-    name: school_timetable_output

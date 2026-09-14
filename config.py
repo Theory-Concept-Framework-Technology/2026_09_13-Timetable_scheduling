@@ -12,6 +12,10 @@ WEB_DIR = BASE_DIR / "src" / "web"
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 
+# Fixed filenames under output/ — each run replaces in place (no versioned copies).
+OUTPUT_TIMETABLE_CSV = "timetable.csv"
+OUTPUT_DASHBOARD_HTML = "timetable_gantt.html"
+
 
 # ============================================================
 # DATA GENERATION

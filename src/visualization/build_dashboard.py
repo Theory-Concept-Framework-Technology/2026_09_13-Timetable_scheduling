@@ -59,6 +59,59 @@ from .html_templates import (
 
 OUTPUT_HTML = OUTPUT_DIR / "timetable_gantt.html"
 
+# Served by nginx / local open — same names every run (replace, do not accumulate).
+SERVE_ARTIFACT_NAMES = (
+    "teachers.csv",
+    "rooms.csv",
+    "courses.csv",
+    "timetable.csv",
+    "timetable_gantt.html",
+    "style.css",
+    "app.js",
+    "optimization_summary.json",
+)
+
+# Removed before each dashboard build; data lives in HTML <script id="dashboard-data">.
+REMOVED_DUPLICATE_NAMES = ("dashboard-data.json",)
+
+
+def clean_dashboard_artifacts() -> None:
+    """Remove prior dashboard UI files so a failed run cannot mix with new output."""
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    for name in REMOVED_DUPLICATE_NAMES:
+        path = OUTPUT_DIR / name
+        if path.is_file():
+            path.unlink()
+    for name in ("timetable_gantt.html", "style.css", "app.js"):
+        path = OUTPUT_DIR / name
+        if path.is_file():
+            path.unlink()
+    assets = OUTPUT_DIR / "assets"
+    if assets.is_dir():
+        shutil.rmtree(assets)
+
+
+def prune_output_to_serve_set() -> None:
+    """Drop files not needed to serve the site (fixed set, replace-on-regenerate)."""
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    allowed = set(SERVE_ARTIFACT_NAMES)
+    allowed.add("assets")
+    for path in OUTPUT_DIR.iterdir():
+        if path.name in allowed:
+            continue
+        if path.name in REMOVED_DUPLICATE_NAMES:
+            if path.is_file():
+                path.unlink()
+            continue
+        if path.is_file():
+            path.unlink()
+        elif path.is_dir() and path.name != "assets":
+            shutil.rmtree(path, ignore_errors=True)
+    for name in REMOVED_DUPLICATE_NAMES:
+        dup = OUTPUT_DIR / name
+        if dup.is_file():
+            dup.unlink()
+
 
 def copy_web_assets() -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -209,6 +262,7 @@ def period_times_for_js() -> Dict[str, List[str]]:
 
 
 def main() -> None:
+    clean_dashboard_artifacts()
     copy_web_assets()
 
     teachers = load_csv_safe(OUTPUT_DIR / "teachers.csv")
@@ -376,12 +430,7 @@ def main() -> None:
     )
 
     OUTPUT_HTML.write_text(html, encoding="utf-8")
-
-    data_path = OUTPUT_DIR / "dashboard-data.json"
-    data_path.write_text(
-        json.dumps(dashboard_json, indent=2, default=str),
-        encoding="utf-8",
-    )
+    prune_output_to_serve_set()
 
     print("\n======================================")
     print("DASHBOARD CREATED SUCCESSFULLY")

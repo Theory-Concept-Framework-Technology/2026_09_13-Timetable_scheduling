@@ -104,6 +104,10 @@ Requires a valid **CPLEX** installation licensed for DOcplex.
 
 Build runs data → model → dashboard; nginx serves `output/` (see `Dockerfile` and `Deploy/nginx/default.conf`).
 
+### Output files (replace on each run)
+
+The pipeline uses **fixed paths** under `output/` — every run **overwrites** the same filenames (no dated copies). The dashboard step clears old HTML/CSS/JS before rebuilding and drops duplicate `dashboard-data.json` (data is embedded in the HTML). Docker uses a **multi-stage build**: CPLEX runs in the builder stage; the runtime image contains only nginx plus the pruned `output/` tree. Compose **does not mount an output volume**, so each deploy shows exactly what is in the new image. If you previously used the `school_timetable_output` volume, remove it once: `docker volume rm school_timetable_output`.
+
 ## Sample Output
 
 | File | Description |
