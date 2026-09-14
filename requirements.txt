@@ -2,6 +2,7 @@ pandas
 faker
 docplex
 plotly
+Cplex
 
 
 # faker
@@ -9,3 +10,4 @@ plotly
 # plotly
 # docplex
 # cplex
+

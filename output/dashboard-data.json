@@ -1,0 +1,456 @@
+{
+  "days": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday"
+  ],
+  "dayShort": {
+    "Monday": "MON",
+    "Tuesday": "TUE",
+    "Wednesday": "WED",
+    "Thursday": "THU",
+    "Friday": "FRI"
+  },
+  "periods": [
+    1,
+    2,
+    3
+  ],
+  "periodTimes": {
+    "1": [
+      "09:00",
+      "10:00"
+    ],
+    "2": [
+      "10:00",
+      "11:00"
+    ],
+    "3": [
+      "11:00",
+      "12:00"
+    ]
+  },
+  "breakRows": [
+    {
+      "start": "12:00",
+      "end": "12:30",
+      "label": "Lunch",
+      "after_period": 3
+    }
+  ],
+  "colorBy": "course_name",
+  "colorMap": {
+    "Artificial Intelligence": "#6366F1",
+    "Cloud Computing": "#EC4899",
+    "Computer Networks": "#14B8A6",
+    "Cyber Security": "#F59E0B",
+    "DBMS": "#8B5CF6",
+    "Data Mining": "#EF4444",
+    "Data Structures": "#06B6D4",
+    "Machine Learning": "#84CC16",
+    "Operating Systems": "#F97316",
+    "Power BI": "#3B82F6",
+    "Python": "#A855F7",
+    "SQL": "#10B981",
+    "Software Engineering": "#E11D48",
+    "Statistics": "#0EA5E9",
+    "Web Development": "#CA8A04"
+  },
+  "showTeacher": true,
+  "showRoom": true,
+  "showSection": true,
+  "schoolName": "Springfield College of Technology",
+  "academicYear": "2026\u20132027",
+  "weekLabel": "Week of 5 Jan 2026",
+  "weekOptions": [
+    "Week of 5 Jan 2026"
+  ],
+  "sections": [
+    "A",
+    "B"
+  ],
+  "teacherNames": {
+    "T1": "Allison Hill",
+    "T2": "Noah Rhodes",
+    "T3": "Angie Henderson",
+    "T4": "Daniel Wagner",
+    "T5": "Cristian Santos",
+    "T6": "Connie Lawrence",
+    "T7": "Abigail Shaffer",
+    "T8": "Gina Moore",
+    "T9": "Gabrielle Davis",
+    "T10": "Ryan Munoz"
+  },
+  "roomCapacities": {
+    "R1": 30,
+    "R2": 30,
+    "R3": 50,
+    "R4": 40
+  },
+  "roomUtilization": [
+    {
+      "room_id": "R1",
+      "capacity": 30,
+      "classes_scheduled": 10,
+      "utilization_pct": 66.7,
+      "slot_capacity": 15
+    },
+    {
+      "room_id": "R2",
+      "capacity": 30,
+      "classes_scheduled": 0,
+      "utilization_pct": 0.0,
+      "slot_capacity": 15
+    },
+    {
+      "room_id": "R3",
+      "capacity": 50,
+      "classes_scheduled": 0,
+      "utilization_pct": 0.0,
+      "slot_capacity": 15
+    },
+    {
+      "room_id": "R4",
+      "capacity": 40,
+      "classes_scheduled": 5,
+      "utilization_pct": 33.3,
+      "slot_capacity": 15
+    }
+  ],
+  "timetable": [
+    {
+      "course_id": "C1",
+      "course_name": "Python",
+      "section": "A",
+      "teacher": "T4",
+      "room": "R1",
+      "day": "Monday",
+      "period": 1,
+      "teacher_name": "Daniel Wagner"
+    },
+    {
+      "course_id": "C2",
+      "course_name": "SQL",
+      "section": "A",
+      "teacher": "T2",
+      "room": "R1",
+      "day": "Monday",
+      "period": 2,
+      "teacher_name": "Noah Rhodes"
+    },
+    {
+      "course_id": "C3",
+      "course_name": "Data Structures",
+      "section": "B",
+      "teacher": "T10",
+      "room": "R4",
+      "day": "Friday",
+      "period": 1,
+      "teacher_name": "Ryan Munoz"
+    },
+    {
+      "course_id": "C4",
+      "course_name": "DBMS",
+      "section": "A",
+      "teacher": "T1",
+      "room": "R1",
+      "day": "Tuesday",
+      "period": 1,
+      "teacher_name": "Allison Hill"
+    },
+    {
+      "course_id": "C5",
+      "course_name": "Machine Learning",
+      "section": "A",
+      "teacher": "T2",
+      "room": "R1",
+      "day": "Tuesday",
+      "period": 2,
+      "teacher_name": "Noah Rhodes"
+    },
+    {
+      "course_id": "C6",
+      "course_name": "Statistics",
+      "section": "A",
+      "teacher": "T4",
+      "room": "R4",
+      "day": "Thursday",
+      "period": 1,
+      "teacher_name": "Daniel Wagner"
+    },
+    {
+      "course_id": "C7",
+      "course_name": "Computer Networks",
+      "section": "A",
+      "teacher": "T9",
+      "room": "R1",
+      "day": "Wednesday",
+      "period": 1,
+      "teacher_name": "Gabrielle Davis"
+    },
+    {
+      "course_id": "C8",
+      "course_name": "Operating Systems",
+      "section": "B",
+      "teacher": "T9",
+      "room": "R1",
+      "day": "Wednesday",
+      "period": 2,
+      "teacher_name": "Gabrielle Davis"
+    },
+    {
+      "course_id": "C9",
+      "course_name": "Cloud Computing",
+      "section": "B",
+      "teacher": "T4",
+      "room": "R4",
+      "day": "Thursday",
+      "period": 2,
+      "teacher_name": "Daniel Wagner"
+    },
+    {
+      "course_id": "C10",
+      "course_name": "Power BI",
+      "section": "B",
+      "teacher": "T10",
+      "room": "R1",
+      "day": "Thursday",
+      "period": 1,
+      "teacher_name": "Ryan Munoz"
+    },
+    {
+      "course_id": "C11",
+      "course_name": "Artificial Intelligence",
+      "section": "A",
+      "teacher": "T1",
+      "room": "R1",
+      "day": "Thursday",
+      "period": 2,
+      "teacher_name": "Allison Hill"
+    },
+    {
+      "course_id": "C12",
+      "course_name": "Web Development",
+      "section": "B",
+      "teacher": "T7",
+      "room": "R4",
+      "day": "Wednesday",
+      "period": 1,
+      "teacher_name": "Abigail Shaffer"
+    },
+    {
+      "course_id": "C13",
+      "course_name": "Data Mining",
+      "section": "A",
+      "teacher": "T5",
+      "room": "R1",
+      "day": "Friday",
+      "period": 1,
+      "teacher_name": "Cristian Santos"
+    },
+    {
+      "course_id": "C14",
+      "course_name": "Cyber Security",
+      "section": "B",
+      "teacher": "T4",
+      "room": "R1",
+      "day": "Friday",
+      "period": 2,
+      "teacher_name": "Daniel Wagner"
+    },
+    {
+      "course_id": "C15",
+      "course_name": "Software Engineering",
+      "section": "A",
+      "teacher": "T2",
+      "room": "R4",
+      "day": "Friday",
+      "period": 2,
+      "teacher_name": "Noah Rhodes"
+    }
+  ],
+  "teachers": [
+    {
+      "teacher_id": "T1",
+      "teacher_name": "Allison Hill"
+    },
+    {
+      "teacher_id": "T2",
+      "teacher_name": "Noah Rhodes"
+    },
+    {
+      "teacher_id": "T3",
+      "teacher_name": "Angie Henderson"
+    },
+    {
+      "teacher_id": "T4",
+      "teacher_name": "Daniel Wagner"
+    },
+    {
+      "teacher_id": "T5",
+      "teacher_name": "Cristian Santos"
+    },
+    {
+      "teacher_id": "T6",
+      "teacher_name": "Connie Lawrence"
+    },
+    {
+      "teacher_id": "T7",
+      "teacher_name": "Abigail Shaffer"
+    },
+    {
+      "teacher_id": "T8",
+      "teacher_name": "Gina Moore"
+    },
+    {
+      "teacher_id": "T9",
+      "teacher_name": "Gabrielle Davis"
+    },
+    {
+      "teacher_id": "T10",
+      "teacher_name": "Ryan Munoz"
+    }
+  ],
+  "rooms": [
+    {
+      "room_id": "R1",
+      "capacity": 30
+    },
+    {
+      "room_id": "R2",
+      "capacity": 30
+    },
+    {
+      "room_id": "R3",
+      "capacity": 50
+    },
+    {
+      "room_id": "R4",
+      "capacity": 40
+    }
+  ],
+  "courses": [
+    {
+      "course_id": "C1",
+      "course_name": "Python",
+      "teacher_id": "T4",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C2",
+      "course_name": "SQL",
+      "teacher_id": "T2",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C3",
+      "course_name": "Data Structures",
+      "teacher_id": "T10",
+      "section": "B",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C4",
+      "course_name": "DBMS",
+      "teacher_id": "T1",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C5",
+      "course_name": "Machine Learning",
+      "teacher_id": "T2",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C6",
+      "course_name": "Statistics",
+      "teacher_id": "T4",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C7",
+      "course_name": "Computer Networks",
+      "teacher_id": "T9",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C8",
+      "course_name": "Operating Systems",
+      "teacher_id": "T9",
+      "section": "B",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C9",
+      "course_name": "Cloud Computing",
+      "teacher_id": "T4",
+      "section": "B",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C10",
+      "course_name": "Power BI",
+      "teacher_id": "T10",
+      "section": "B",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C11",
+      "course_name": "Artificial Intelligence",
+      "teacher_id": "T1",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C12",
+      "course_name": "Web Development",
+      "teacher_id": "T7",
+      "section": "B",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C13",
+      "course_name": "Data Mining",
+      "teacher_id": "T5",
+      "section": "A",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C14",
+      "course_name": "Cyber Security",
+      "teacher_id": "T4",
+      "section": "B",
+      "weekly_classes": 1
+    },
+    {
+      "course_id": "C15",
+      "course_name": "Software Engineering",
+      "teacher_id": "T2",
+      "section": "A",
+      "weekly_classes": 1
+    }
+  ],
+  "kpis": {
+    "total_courses": 15,
+    "total_teachers": 10,
+    "total_rooms": 4,
+    "total_time_slots": 15,
+    "scheduled_classes": 15,
+    "required_classes": 15,
+    "unscheduled_classes": 0,
+    "objective_value": 0.0,
+    "solver_status": "JobSolveStatus.OPTIMAL_SOLUTION",
+    "num_decision_variables": 900,
+    "num_constraints": 210,
+    "optimization_status_label": "Optimal / Feasible",
+    "optimization_status_class": "status-success"
+  }
+}

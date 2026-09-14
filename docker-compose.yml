@@ -1,0 +1,65 @@
+# School_Timetable_Fresh
+#
+# Python + CPLEX timetable generator
+# + Plotly dashboard
+#
+# The container:
+#   1. Generates Faker data
+#   2. Runs CPLEX optimization
+#   3. Generates timetable_gantt.html
+#   4. Serves the generated dashboard using nginx
+
+services:
+
+  school-timetable:
+
+    image: ${IMAGE_NAME:-school-timetable-fresh}:${IMAGE_TAG:-latest}
+
+    container_name: school-timetable-fresh
+
+    restart: unless-stopped
+
+    ports:
+      - "${APP_PORT:-8080}:80"
+
+    environment:
+      PYTHONUNBUFFERED: "1"
+
+    volumes:
+      # Persist generated timetable files
+      - timetable_output:/app/output
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-qO-",
+          "http://127.0.0.1:80/"
+        ]
+
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    networks:
+      - timetable-network
+
+    labels:
+      - "app=school-timetable-fresh"
+      - "project=school-timetable"
+      - "tier=application"
+
+
+networks:
+
+  timetable-network:
+    driver: bridge
+    name: school_timetable_network
+
+
+volumes:
+
+  timetable_output:
+    name: school_timetable_output

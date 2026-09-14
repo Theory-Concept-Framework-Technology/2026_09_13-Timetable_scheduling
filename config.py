@@ -8,7 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 OUTPUT_DIR = BASE_DIR / "output"
-WEB_DIR = BASE_DIR / "web"
+WEB_DIR = BASE_DIR / "src" / "web"
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -90,13 +90,36 @@ GANTT_BAR_HEIGHT = 0.6
 # UI SETTINGS
 # ------------------------------------------------------------
 
-PAGE_TITLE = "College Timetable Dashboard"
+PAGE_TITLE = "Smart Timetable Scheduler"
 
-PROJECT_TITLE = "College Timetable"
+PROJECT_TITLE = "Smart Timetable Scheduler"
 
 PROJECT_SUBTITLE = (
-    "CPLEX Optimized Academic Scheduling"
+    "Optimization-based Academic Scheduling"
 )
+
+TECH_BADGES = [
+    "Python",
+    "IBM CPLEX",
+    "Linear Programming",
+    "Faker",
+]
+
+SCHOOL_NAME = "Springfield College of Technology"
+
+ACADEMIC_YEAR = "2026–2027"
+
+CURRENT_WEEK_LABEL = "Week of 5 Jan 2026"
+
+# Display-only rows (not from CPLEX); inserted into the weekly grid UI
+TIMETABLE_DISPLAY_BREAKS = [
+    {
+        "start": "12:00",
+        "end": "12:30",
+        "label": "Lunch",
+        "after_period": 3,
+    },
+]
 
 
 # ============================================================

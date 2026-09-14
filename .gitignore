@@ -1,3 +1,38 @@
-/.TIMEenvTABLE
-\.TIMEenvTABLE
-\output
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.TIMEenvTABLE/
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Lint
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Jenkins temporary environments
+.ci-venv/
+.test-venv/
+.lint-venv/
+
+# Generated output
+output/*.csv
+output/*.html
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

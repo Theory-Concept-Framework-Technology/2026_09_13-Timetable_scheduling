@@ -1,0 +1,10 @@
+{
+  "model_name": "College_Timetable",
+  "solver_status": "JobSolveStatus.OPTIMAL_SOLUTION",
+  "objective_value": 0.0,
+  "num_decision_variables": 900,
+  "num_constraints": 210,
+  "required_weekly_classes": 15,
+  "scheduled_classes": 15,
+  "generated_at": "2026-09-14T10:34:47.741798+00:00"
+}

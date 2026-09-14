@@ -1,4 +1,7 @@
 from docplex.mp.model import Model
+import json
+from datetime import datetime, timezone
+
 import pandas as pd
 
 from config import (
@@ -327,6 +330,27 @@ timetable_df.to_csv(
     index=False
 )
 
+required_weekly = int(courses["weekly_classes"].sum())
+
+summary = {
+    "model_name": "College_Timetable",
+    "solver_status": str(model.get_solve_status()),
+    "objective_value": float(solution.objective_value),
+    "num_decision_variables": len(x),
+    "num_constraints": model.number_of_constraints,
+    "required_weekly_classes": required_weekly,
+    "scheduled_classes": len(timetable_df),
+    "generated_at": datetime.now(timezone.utc).isoformat(),
+}
+
+summary_path = OUTPUT_DIR / "optimization_summary.json"
+summary_path.write_text(
+    json.dumps(summary, indent=2),
+    encoding="utf-8",
+)
+
+print("\nOptimization summary saved:")
+print(summary_path)
 
 print("\nTimetable saved:")
 print(output_file)

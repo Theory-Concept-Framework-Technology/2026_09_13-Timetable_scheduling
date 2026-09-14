@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+.github
+
+# Jenkins
+.jenkins-venv
+.venv
+venv
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.vscode
+.idea
+
+# Temporary files
+*.tmp
+*.log
+
+# Existing generated output
+output/*.csv
+output/*.html
+
+# Documentation
+README.md
+
+# OS
+.DS_Store
+Thumbs.db
