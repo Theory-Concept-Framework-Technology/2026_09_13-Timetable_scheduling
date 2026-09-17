@@ -1,0 +1,122 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "home-meal-planner"
+        GHCR_IMAGE_API = "ghcr.io/theory-concept-framework-technology/home-meal-api"
+        GHCR_IMAGE_WEB = "ghcr.io/theory-concept-framework-technology/home-meal-web"
+        DEPLOY_DIR = "/opt/home-meal-planner"
+        WEB_PORT = "8000"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "Checking out dev branch..."
+                checkout scm
+            }
+        }
+
+        stage('Verify Meal Planner') {
+            steps {
+                sh '''
+                    echo "=== Meal Planner Files ==="
+                    pwd
+                    ls -la
+
+                    echo "=== Backend ==="
+                    ls -la backend/app
+
+                    echo "=== Frontend ==="
+                    ls -la frontend
+
+                    echo "=== Docker Files ==="
+                    ls -la deploy
+                    test -f deploy/Dockerfile.api
+                    test -f deploy/Dockerfile.web
+                    test -f docker-compose.yml
+                '''
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh '''
+                    echo "Building Meal Planner images..."
+
+                    docker build \
+                      -f deploy/Dockerfile.api \
+                      -t ${GHCR_IMAGE_API}:latest \
+                      .
+
+                    docker build \
+                      -f deploy/Dockerfile.web \
+                      -t ${GHCR_IMAGE_WEB}:latest \
+                      .
+                '''
+            }
+        }
+
+        stage('Docker Test') {
+            steps {
+                sh '''
+                    echo "Testing Docker images..."
+
+                    docker network create meal-planner-test-net || true
+
+                    docker run -d \
+                      --name meal-api-test \
+                      --network meal-planner-test-net \
+                      ${GHCR_IMAGE_API}:latest
+
+                    sleep 10
+
+                    docker ps
+
+                    docker logs meal-api-test || true
+
+                    docker rm -f meal-api-test || true
+                    docker network rm meal-planner-test-net || true
+                '''
+            }
+        }
+
+        stage('Push Images to GHCR') {
+            steps {
+                echo "Pushing images to GHCR..."
+                echo "GHCR push will be enabled after registry credentials are configured."
+            }
+        }
+
+        stage('Deploy to DigitalOcean') {
+            steps {
+                echo "Deployment stage prepared."
+                echo "Production deployment will use GHCR images."
+            }
+        }
+    }
+
+    post {
+        always {
+            sh '''
+                echo "Cleaning temporary Docker resources..."
+                docker rm -f meal-api-test 2>/dev/null || true
+                docker network rm meal-planner-test-net 2>/dev/null || true
+            '''
+        }
+
+        success {
+            echo "======================================"
+            echo "Meal Planner Pipeline SUCCESS"
+            echo "======================================"
+        }
+
+        failure {
+            echo "======================================"
+            echo "Meal Planner Pipeline FAILED"
+            echo "Check Console Output"
+            echo "======================================"
+        }
+    }
+}
