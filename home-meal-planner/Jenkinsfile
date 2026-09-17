@@ -1,121 +1,98 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = "home-meal-planner"
-        GHCR_IMAGE_API = "ghcr.io/theory-concept-framework-technology/home-meal-api"
-        GHCR_IMAGE_WEB = "ghcr.io/theory-concept-framework-technology/home-meal-web"
-        DEPLOY_DIR = "/opt/home-meal-planner"
-        WEB_PORT = "8000"
-    }
-
     stages {
-
-        stage('Checkout') {
-            steps {
-                echo "Checking out dev branch..."
-                checkout scm
-            }
-        }
 
         stage('Verify Meal Planner') {
             steps {
                 sh '''
-                    echo "=== Meal Planner Files ==="
-                    pwd
-                    ls -la
+                    set -e
 
-                    echo "=== Backend ==="
+                    echo "======================================"
+                    echo "HOME MEAL PLANNER"
+                    echo "======================================"
+
+                    cd home-meal-planner
+
+                    echo "Current directory:"
+                    pwd
+
+                    echo "Backend:"
                     ls -la backend/app
 
-                    echo "=== Frontend ==="
+                    echo "Frontend:"
                     ls -la frontend
 
-                    echo "=== Docker Files ==="
+                    echo "Deploy:"
                     ls -la deploy
+
+                    echo "Checking Docker files..."
+
                     test -f deploy/Dockerfile.api
                     test -f deploy/Dockerfile.web
                     test -f docker-compose.yml
+
+                    echo "Meal Planner files verified successfully."
                 '''
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build API Docker Image') {
             steps {
                 sh '''
-                    echo "Building Meal Planner images..."
+                    set -e
+                    cd home-meal-planner
+
+                    echo "Building Meal API image..."
 
                     docker build \
-                      -f deploy/Dockerfile.api \
-                      -t ${GHCR_IMAGE_API}:latest \
-                      .
+                        -f deploy/Dockerfile.api \
+                        -t home-meal-api:latest \
+                        .
 
-                    docker build \
-                      -f deploy/Dockerfile.web \
-                      -t ${GHCR_IMAGE_WEB}:latest \
-                      .
+                    echo "API image built successfully."
                 '''
             }
         }
 
-        stage('Docker Test') {
+        stage('Build Web Docker Image') {
             steps {
                 sh '''
-                    echo "Testing Docker images..."
+                    set -e
+                    cd home-meal-planner
 
-                    docker network create meal-planner-test-net || true
+                    echo "Building Meal Web image..."
 
-                    docker run -d \
-                      --name meal-api-test \
-                      --network meal-planner-test-net \
-                      ${GHCR_IMAGE_API}:latest
+                    docker build \
+                        -f deploy/Dockerfile.web \
+                        -t home-meal-web:latest \
+                        .
 
-                    sleep 10
-
-                    docker ps
-
-                    docker logs meal-api-test || true
-
-                    docker rm -f meal-api-test || true
-                    docker network rm meal-planner-test-net || true
+                    echo "Web image built successfully."
                 '''
             }
         }
 
-        stage('Push Images to GHCR') {
+        stage('Docker Images') {
             steps {
-                echo "Pushing images to GHCR..."
-                echo "GHCR push will be enabled after registry credentials are configured."
-            }
-        }
-
-        stage('Deploy to DigitalOcean') {
-            steps {
-                echo "Deployment stage prepared."
-                echo "Production deployment will use GHCR images."
+                sh '''
+                    echo "Docker images created:"
+                    docker images | grep home-meal || true
+                '''
             }
         }
     }
 
     post {
-        always {
-            sh '''
-                echo "Cleaning temporary Docker resources..."
-                docker rm -f meal-api-test 2>/dev/null || true
-                docker network rm meal-planner-test-net 2>/dev/null || true
-            '''
-        }
-
         success {
             echo "======================================"
-            echo "Meal Planner Pipeline SUCCESS"
+            echo "MEAL PLANNER PIPELINE SUCCESS"
             echo "======================================"
         }
 
         failure {
             echo "======================================"
-            echo "Meal Planner Pipeline FAILED"
-            echo "Check Console Output"
+            echo "MEAL PLANNER PIPELINE FAILED"
             echo "======================================"
         }
     }
