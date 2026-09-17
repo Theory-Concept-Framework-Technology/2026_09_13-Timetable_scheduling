@@ -1,0 +1,53 @@
+name: home-meal-planner
+
+services:
+  meal-api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.api
+    container_name: home-meal-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MEAL_DB_PATH: /app/data/meals.db
+      MEAL_CACHE_DIR: /app/data/meal_cache
+    volumes:
+      - planner_data:/app/data
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/meals/health')"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - planner-net
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+    container_name: home-meal-web
+    restart: unless-stopped
+    depends_on:
+      meal-api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8000}:80"
+    networks:
+      - planner-net
+
+volumes:
+  planner_data:
+
+networks:
+  planner-net:
+    driver: bridge
