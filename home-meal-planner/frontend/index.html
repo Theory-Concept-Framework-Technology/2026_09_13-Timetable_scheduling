@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="meal-api-base" content="">
+
+    <title>Home Meal Planner</title>
+
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css?v=5">
+
+</head>
+
+<body class="app-body">
+
+<header class="site-header">
+
+    <div class="site-brand">
+
+        <span class="brand-icon" aria-hidden="true">🥗</span>
+
+        <div>
+
+            <span class="site-title">Home Meal Planner</span>
+
+            <span class="site-tagline">Vegetarian weekly kitchen timetable</span>
+
+        </div>
+
+    </div>
+
+    <nav class="top-nav" aria-label="Main">
+
+        <button type="button" class="top-nav-link active" data-section="meals-dashboard"><span class="nav-emoji">📊</span> Dashboard</button>
+
+        <button type="button" class="top-nav-link" data-section="meals-weekly"><span class="nav-emoji">📅</span> Weekly plan</button>
+
+        <button type="button" class="top-nav-link" data-section="meals-search"><span class="nav-emoji">🔍</span> Search</button>
+
+    </nav>
+
+</header>
+
+
+
+<main class="site-main">
+
+    <section id="section-meals-dashboard" class="page-section active">
+
+        <div class="hero-banner panel">
+
+            <div class="hero-text">
+
+                <p class="hero-eyebrow">🌱 100% vegetarian · Indian home kitchen</p>
+
+                <h1>Plan meals you&apos;ll actually enjoy</h1>
+
+                <p class="section-lead">Balanced breakfast, lunch, snack &amp; dinner — with photos, macros, and a fresh weekly rotation.</p>
+
+                <p class="today-pill" id="today-pill"></p>
+
+            </div>
+
+            <div class="hero-art" aria-hidden="true">🍛 🥘 🍲 🥗</div>
+
+        </div>
+
+        <p class="nutrition-disclaimer muted" id="meals-global-disclaimer"></p>
+
+        <div id="meals-api-banner" class="meals-banner" hidden></div>
+
+
+
+        <div class="section-head-row">
+
+            <h2 class="subsection-title">Today&apos;s meals</h2>
+
+        </div>
+
+        <div id="meals-today-grid" class="meals-today-grid"></div>
+
+
+
+        <h2 class="subsection-title">Today&apos;s nutrition</h2>
+
+        <div id="meals-today-nutrition" class="kpi-grid meals-nutrition-kpis"></div>
+
+        <div class="meals-calorie-bar-wrap panel">
+
+            <div class="meals-calorie-bar-head">
+
+                <strong>🔥 Today&apos;s calories</strong>
+
+                <span id="meals-calorie-bar-label" class="muted"></span>
+
+            </div>
+
+            <div class="meals-calorie-bar-track"><div id="meals-calorie-bar-fill" class="meals-calorie-bar-fill"></div></div>
+
+        </div>
+
+
+
+        <div class="meals-toolbar">
+
+            <button type="button" class="btn-primary btn-lg" id="btn-generate-meal-plan">✨ Shuffle fresh weekly menu</button>
+
+            <button type="button" class="btn-secondary" data-goto-section="meals-weekly">📅 Full week</button>
+
+            <button type="button" class="btn-text" data-goto-section="meals-search">🔍 Find recipes</button>
+
+        </div>
+
+
+
+        <h2 class="subsection-title">Weekly preview</h2>
+
+        <div id="meals-weekly-preview" class="meals-weekly-wrap meals-weekly-rich"></div>
+
+        <div id="meals-weekly-chart" class="meals-week-chart panel"></div>
+
+    </section>
+
+
+
+    <section id="section-meals-weekly" class="page-section">
+
+        <div class="page-intro">
+
+            <h1>📅 Weekly meal timetable</h1>
+
+            <p class="muted section-lead">Tap any dish for ingredients, steps, and nutrition.</p>
+
+        </div>
+
+        <div id="meals-weekly-full" class="meals-weekly-wrap meals-weekly-rich"></div>
+
+        <div id="meals-weekly-mobile" class="meals-day-cards"></div>
+
+    </section>
+
+
+
+    <section id="section-meals-search" class="page-section">
+
+        <div class="page-intro">
+
+            <h1>🔍 Recipe search</h1>
+
+            <p class="muted section-lead">Filter by meal type, time, calories, or high protein.</p>
+
+        </div>
+
+        <div class="meals-search-toolbar panel">
+
+            <label>Search
+
+                <input type="search" id="meals-search-input" placeholder="Paneer, dal, breakfast…" autocomplete="off">
+
+            </label>
+
+            <label>Meal type
+
+                <select id="meals-filter-type">
+
+                    <option value="">Any</option>
+
+                    <option value="breakfast">🍳 Breakfast</option>
+
+                    <option value="lunch">🍛 Lunch</option>
+
+                    <option value="snack">🥗 Snack</option>
+
+                    <option value="dinner">🌙 Dinner</option>
+
+                </select>
+
+            </label>
+
+            <label>Cuisine
+
+                <select id="meals-filter-cuisine">
+
+                    <option value="">Any</option>
+
+                    <option value="indian">Indian</option>
+
+                    <option value="other">Other vegetarian</option>
+
+                </select>
+
+            </label>
+
+            <label>Prep time
+
+                <select id="meals-filter-time">
+
+                    <option value="">Any</option>
+
+                    <option value="15">&lt; 15 min</option>
+
+                    <option value="30">&lt; 30 min</option>
+
+                    <option value="60">&lt; 60 min</option>
+
+                </select>
+
+            </label>
+
+            <label>Max calories
+
+                <input type="number" id="meals-filter-max-cal" min="0" step="50" placeholder="e.g. 500">
+
+            </label>
+
+            <label class="meals-checkbox-label">
+
+                <input type="checkbox" id="meals-filter-high-protein"> High protein (15g+)
+
+            </label>
+
+            <button type="button" class="btn-primary" id="meals-search-btn">Search</button>
+
+        </div>
+
+        <div id="meals-search-results" class="meals-search-results"></div>
+
+        <div id="meals-search-empty" class="muted empty-hint" hidden>No recipes matched. Try another term or filter.</div>
+
+    </section>
+
+</main>
+
+
+
+<div id="cell-modal" class="cell-modal" hidden>
+
+    <div class="cell-modal-backdrop" id="modal-backdrop"></div>
+
+    <div class="cell-modal-card panel" role="dialog" aria-modal="true">
+
+        <button type="button" class="cell-modal-close" id="modal-close" aria-label="Close">&times;</button>
+
+        <div id="modal-content"></div>
+
+    </div>
+
+</div>
+
+
+
+<script src="js/planner.js?v=5"></script>
+
+<script src="js/ui.js?v=5"></script>
+
+</body>
+
+</html>
+
+
