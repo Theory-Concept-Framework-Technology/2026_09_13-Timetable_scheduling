@@ -1,0 +1,8 @@
+services:
+  mouse-gaze:
+    build: .
+    image: mouse-gaze:latest
+    container_name: mouse-gaze
+    restart: unless-stopped
+    environment:
+      SDL_AUDIODRIVER: dummy
