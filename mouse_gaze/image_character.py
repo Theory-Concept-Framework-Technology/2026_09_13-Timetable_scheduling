@@ -77,6 +77,7 @@ class ImageCharacter(Character):
         self._pupil = _scale(self._pupil_source, scale) if self._pupil_source is not None else None
         assert self._head is not None
         self._frame = pygame.Surface(self._head.get_size(), pygame.SRCALPHA)
+        self._backdrop = _backdrop(size)
 
     def rest_anchor(self) -> tuple[float, float]:
         return self._anchor
@@ -88,6 +89,7 @@ class ImageCharacter(Character):
     def draw(self, surface: pygame.Surface) -> None:
         assert self._head is not None and self._frame is not None
         breathe = breathe_offset(self._time)
+        surface.blit(self._backdrop, (0, 0))
         if self._body is not None:
             surface.blit(self._body, (self._body_pos[0], self._body_pos[1] + round(breathe)))
         frame = self._frame
@@ -107,6 +109,28 @@ class ImageCharacter(Character):
             return
         radius = max(2, round(min(self._pupil_range) * 0.45))
         pygame.draw.circle(surface, (24, 16, 16), (round(x), round(y)), radius)
+
+
+def _backdrop(size: tuple[int, int]) -> pygame.Surface:
+    width, height = size
+    surface = pygame.Surface(size)
+    top = (246, 234, 226)
+    bottom = (228, 190, 180)
+    if height <= 1:
+        surface.fill(top)
+        return surface
+    for y in range(height):
+        blend = y / (height - 1)
+        color = tuple(int(channel + (other - channel) * blend) for channel, other in zip(top, bottom))
+        pygame.draw.line(surface, color, (0, y), (width, y))
+    glow = pygame.Surface(size, pygame.SRCALPHA)
+    pygame.draw.ellipse(
+        glow,
+        (255, 246, 240, 90),
+        pygame.Rect(int(width * 0.18), int(height * 0.06), int(width * 0.64), int(height * 0.78)),
+    )
+    surface.blit(glow, (0, 0))
+    return surface
 
 
 def _read_config(path: Path) -> dict:

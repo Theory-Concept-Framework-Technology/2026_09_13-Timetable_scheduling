@@ -1,0 +1,44 @@
+{
+  "reference_size": [
+    1280,
+    720
+  ],
+  "anchor": [
+    630,
+    240
+  ],
+  "body": "body.png",
+  "body_pos": [
+    411,
+    114
+  ],
+  "head": "head.png",
+  "head_pivot": [
+    234,
+    332
+  ],
+  "head_pos": [
+    631,
+    370
+  ],
+  "eyes": [
+    [
+      187,
+      202
+    ],
+    [
+      280,
+      201
+    ]
+  ],
+  "pupil": "pupil.png",
+  "pupil_range": [
+    6,
+    4
+  ],
+  "max_head_degrees": 8,
+  "head_shift": [
+    12,
+    8
+  ]
+}

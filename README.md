@@ -6,10 +6,10 @@ A small Pygame window with a girl whose eyes and head follow the mouse. The poin
 
 ```powershell
 cd C:\Users\shukl\mouse-gaze
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe main.py
+run.bat
 ```
+
+`run.bat` checks Python, creates `.venv` if needed, installs dependencies, and opens version 2. `run.bat v1` opens the original drawn character instead.
 
 Esc or the window close button quits. The window can be resized; she stays inside it.
 

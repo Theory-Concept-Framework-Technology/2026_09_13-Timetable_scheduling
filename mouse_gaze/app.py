@@ -7,7 +7,7 @@ import pygame
 from mouse_gaze.factory import create_character
 from mouse_gaze.tracker import MouseTracker
 
-WINDOW_SIZE = (960, 720)
+WINDOW_SIZE = (1280, 720)
 MIN_SIZE = 240
 HUD_COLOR = (78, 52, 58)
 HUD_PANEL = (255, 248, 244, 188)
